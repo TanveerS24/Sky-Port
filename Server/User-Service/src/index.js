@@ -4,6 +4,18 @@ dotenv.config();
 import app from './app.js';
 import connectDB from './config/db.js';
 
+import userRoutes from './routes/user.routes.js';
+
+app.use('/user', userRoutes);
+
+app.get('/', (req, res) => {
+  res.json({
+    service: "User Service",
+    baseUrl: process.env.BASE_URL,
+    status: "running"
+  });
+});
+
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
