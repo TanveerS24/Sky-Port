@@ -1,7 +1,5 @@
-import AuthForm from "../../src/features/auth/authForm";
+import Register from "../../src/features/register/register"
 
-const register = () => {
-    return <AuthForm mode="register"/>;
+export default function RegisterPage() {
+    return <Register />;
 }
-
-export default register;

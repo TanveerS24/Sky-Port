@@ -1,7 +1,5 @@
-import AuthForm from "../../src/features/auth/authForm";
+import Login from "../../src/features/login/login"
 
-const login = () => {
-    return <AuthForm mode="login"/>;
+export default function LoginPage() {
+    return <Login />;
 }
-
-export default login;
