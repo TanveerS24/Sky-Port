@@ -48,7 +48,7 @@ export default function AppButton({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#2563EB',
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 10,
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   text: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

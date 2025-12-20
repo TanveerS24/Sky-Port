@@ -16,7 +16,7 @@
 
 ---
 
-## 📊 **Project Completion Status: 20%**
+## 📊 **Project Completion Status: 5%**
 
 ---
 
