@@ -4,16 +4,11 @@ dotenv.config();
 
 import app from './app.js';
 import connectDB from './config/db.js';
+import routes from './routes/auth.routes.js';
 
 const PORT = process.env.PORT || 3001;
 
-app.get('/', (req, res) => {
-  res.json({
-    service: "User Service",
-    baseUrl: process.env.BASE_URL,
-    status: "running"
-  });
-});
+app.use('/auth', routes)
 
 const server = async () => {
   try {

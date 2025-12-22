@@ -2,10 +2,10 @@ import User from '../models/user.model.js';
 
 const createUser = async (req, res) => {
     try {
-        const { username, email, password, devices } = req.body;
+        const { username, email, devices, authUserId } = req.body;
 
         //Testing logs
-        console.log("username: ",username,"\nEmail: ", email,"\nPassword: ", password,"\nDevice: ",devices);
+        console.log("username: ",username,"\nEmail: ", email,"\nDevice: ",devices);
 
         // Check if user with the same email or username already exists
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
@@ -16,8 +16,8 @@ const createUser = async (req, res) => {
         const newUser = new User({
             username,
             email,
-            password,
-            devices
+            devices,
+            authUserId
         });
 
         await newUser.save();

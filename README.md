@@ -16,21 +16,22 @@
 
 ---
 
-## 📊 **Project Completion Status: 5%**
+## 📊 **Project Completion Status: 8%**
 
 ---
 
-## ✅ **Completed Features (3/55 Services)**
+## ✅ **Completed Features (5/56   Services)**
 
 - ✅ User registration & profile management
 - ✅ Independent microservice setup
 - ✅ REST API foundation
+- ✅ Authentication Service (token lifecycle, refresh, revoke)
+- ✅ JWT authentication (access & refresh tokens)
 
 ---
 
-## 📝 **Planned Features (Remaining Services) (Total 55)**
+## 📝 **Planned Features (Remaining Services) (Total 56)**
 
-- ⬜ Authentication Service (token lifecycle, refresh, revoke)
 - ⬜ File Service (upload, share, audit, storage tracking)
 - ⬜ Group Service (groups, access control, permissions)
 - ⬜ Chat Service (1-to-1 and group messaging)
@@ -39,7 +40,7 @@
 - ⬜ End-to-end encrypted file transfers
 - ⬜ Advanced audit logs (GitHub-style activity)
 - ⬜ Search files by user inside folders
-- ⬜ JWT authentication (access & refresh tokens)
+- ⬜ Separate DB for each service
 - ⬜ Encrypted storage of sensitive user data
 - ⬜ Access & Refresh token lifecycle management
 - ⬜ Token rotation and revocation
