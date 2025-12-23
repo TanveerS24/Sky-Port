@@ -3,9 +3,13 @@ import authUser from '../models/authUser.model.js';
 import { generateAccessToken } from '../utils/token.util.js';
 
 const refreshTokenController = async (req, res) => {
+    console.log('Refresh Token controller invoked');
     const { refreshToken } = req.body;
 
-    if (!refreshToken) res.status(400).json({ message: 'Refresh token is required' });
+    if (!refreshToken) {
+        console.log('No refresh token provided in request body');
+        return res.status(400).json({ message: 'Refresh token is required' });
+    }
 
     const user = await authUser.findOne({ refreshToken });
     if (!user) return res.status(401).json({ message: 'Invalid refresh token' });
@@ -14,10 +18,12 @@ const refreshTokenController = async (req, res) => {
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
         const payload = { id: decoded.id, email: decoded.email };
         const newAccessToken = generateAccessToken(payload);
-        res.json({ accessToken: newAccessToken });
+
+        console.log('New access token generated successfully');
+        return res.json({ accessToken: newAccessToken });
     } catch (error) {
         console.error('Refresh token verification failed:', error);
-        res.status(401).json({ message: 'Invalid or expired refresh token' });
+        return res.status(401).json({ message: 'Invalid or expired refresh token' });
     }
 };
 

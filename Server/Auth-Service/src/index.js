@@ -8,7 +8,7 @@ import routes from './routes/auth.routes.js';
 
 const PORT = process.env.PORT || 3001;
 
-app.use('/auth', routes)
+app.use('/', routes)
 
 const server = async () => {
   try {

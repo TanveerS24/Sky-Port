@@ -1,12 +1,14 @@
 import User from "../models/user.model.js";
 
 const deleteUser = async (req, res) => {
+    console.log('Delete User controller invoked');
     try{
         const id = req.params.id;
 
         try {
             const user = await User.findById(id);
             if (!user) {
+                console.log("User doesn't Exist");
                 return res.status(404).json({ message: 'User not found' });
             }
             else{

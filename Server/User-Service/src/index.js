@@ -6,7 +6,7 @@ import connectDB from './config/db.js';
 
 import userRoutes from './routes/user.routes.js';
 
-app.use('/user', userRoutes);
+app.use('/', userRoutes);
 
 const PORT = process.env.PORT || 3000;
 
