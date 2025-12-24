@@ -8,17 +8,17 @@ import routes from './routes/auth.routes.js';
 
 const PORT = process.env.PORT || 3001;
 
-app.use('/auth', routes)
+app.use('/', routes)
 
 const server = async () => {
-  try {
-    await connectDB();
-    app.listen(PORT, () => {
-      console.log(`Auth Service is running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Failed to start server:', error);
-  }
+    try {
+        await connectDB();
+        app.listen(PORT, () => {
+            console.log(`Auth Service is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+    }
 };
 
 server();

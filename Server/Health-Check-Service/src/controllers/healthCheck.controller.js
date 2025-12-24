@@ -1,27 +1,35 @@
 import axios from "axios";
 
-export const checkServicesHealth = async () => {
-    const services = [
-        {
-            name: "user-service",
-            url: process.env.USER_SERVICE_HEALTH_URL
-        },
-        {
-            name: "auth-service",
-            url: process.env.AUTH_SERVICE_HEALTH_URL
-        }
-    ];
+const checkServicesHealth = async (req, res) => {
+    const url = process.env.API_GATEWAY_URL;
+    if (!url) {
+        console.error("API_GATEWAY_URL is not configured");
+        if (res) return res.status(500).json({ message: "API_GATEWAY_URL is not configured" });
+        throw new Error("API_GATEWAY_URL is not configured");
+    }
 
-    console.log("Running health check...");
+    const services = [
+        { name: "User Service", url: `${url}/api/user/health` },
+        { name: "Auth Service", url: `${url}/api/auth/health` },
+    ];
 
     for (const service of services) {
         try {
-            const response = await axios.get(service.url);
-            console.log(`${service.name} is HEALTHY`, response.data);
+            console.log(`Checking health of ${service.name} at ${service.url}`);
+            const response = await axios.get(service.url, { timeout: 5000 });
+            console.log('Response Body:', response.data);
         } catch (error) {
-            console.error(`${service.name} is UNHEALTHY`);
+            if (error.response) {
+                console.error(`Health check failed for ${service.name}:`, error.response.status, error.response.data);
+            } else if (error.request) {
+                console.error(`Health check failed for ${service.name}:`, error.request);
+            } else {
+                console.error(`Health check failed for ${service.name}:`, error.message);
+            }
         }
     }
 
-    console.log("Health check cycle completed\n");
+    return res.status(200).json({ message: "Health check completed" });
 };
+
+export default checkServicesHealth;

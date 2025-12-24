@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 
 const editUser = async (req, res) => {
+    console.log("Edit User controller invoked");
     try {
         const id = req.params.id;
         const updates = req.body;
@@ -25,7 +26,8 @@ const editUser = async (req, res) => {
         return res.status(200).json({ message: 'User updated successfully', user: updatedUser });
 
     } catch (error) {
-        return res.status(400).json({ message: 'Error updating user', error: error.message });
+        console.error("Error updating user: ", error);
+        return res.status(422).json({ message: 'Error updating user', error: error.message });
     }
 };
 

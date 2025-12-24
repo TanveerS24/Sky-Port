@@ -1,6 +1,7 @@
 import User from '../models/user.model.js';
 
 const createUser = async (req, res) => {
+    console.log('Create User controller invoked');
     try {
         const { username, email, devices, authUserId } = req.body;
 
@@ -10,7 +11,8 @@ const createUser = async (req, res) => {
         // Check if user with the same email or username already exists
         const existingUser = await User.findOne({ $or: [{ email }, { username }] });
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists with this email or username' });
+            console.log("User already exists with this email or username:", email, username);
+            return res.status(409).json({ message: 'User already exists with this email or username' });
         }
 
         const newUser = new User({
@@ -21,6 +23,7 @@ const createUser = async (req, res) => {
         });
 
         await newUser.save();
+        console.log("New user created: ", newUser);
         res.status(201).json({ message: 'User created successfully', userId: newUser._id });
         
     } catch (error) {
