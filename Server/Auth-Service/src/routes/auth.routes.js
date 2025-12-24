@@ -4,6 +4,8 @@ import loginController from '../controllers/login.controller.js';
 import logoutController from '../controllers/logout.controller.js';
 import refreshController from '../controllers/refreshToken.controller.js';
 import registerController from '../controllers/register.controller.js';
+import updatePassword from '../controllers/updatePassword.controller.js';
+import deleteUser from '../controllers/deleteUser.controller.js';
 
 const router = Router();
 
@@ -12,5 +14,7 @@ router.post('/login', loginController);
 router.post('/logout', logoutController);
 router.post('/refresh-token', refreshController);
 router.post('/register', registerController);
+router.patch('/update-password/:userId', updatePassword);
+router.delete('/delete-user/:id', deleteUser);
 
 export default router;

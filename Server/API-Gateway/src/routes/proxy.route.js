@@ -6,10 +6,6 @@ import {authRateLimiter, apiRateLimiter} from '../middlewares/rateLimit.middlewa
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.send('API Gateway is running');
-});
-
 router.use('/user',
     apiRateLimiter, 
     verifyAccessToken,
