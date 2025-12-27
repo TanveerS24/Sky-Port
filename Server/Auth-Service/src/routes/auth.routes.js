@@ -6,6 +6,8 @@ import refreshController from '../controllers/refreshToken.controller.js';
 import registerController from '../controllers/register.controller.js';
 import updatePassword from '../controllers/updatePassword.controller.js';
 import deleteUser from '../controllers/deleteUser.controller.js';
+import sendEmailController from '../controllers/sendEmail.controller.js';
+import verifyOTPController from '../controllers/verifyOTP.controller.js';
 
 const router = Router();
 
@@ -16,5 +18,7 @@ router.post('/refresh-token', refreshController);
 router.post('/register', registerController);
 router.patch('/update-password/:userId', updatePassword);
 router.delete('/delete-user/:id', deleteUser);
+router.post('/send-otp', sendEmailController);
+router.post('/verify-otp', verifyOTPController);
 
 export default router;

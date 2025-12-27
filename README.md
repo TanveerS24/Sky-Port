@@ -20,13 +20,18 @@
 
 ---
 
-## ✅ **Completed Features (5/56   Services)**
+## ✅ **Completed Features (9/56   Services)**
 
 - ✅ User registration & profile management
 - ✅ Independent microservice setup
 - ✅ REST API foundation
 - ✅ Authentication Service (token lifecycle, refresh, revoke)
 - ✅ JWT authentication (access & refresh tokens)
+- ✅ Central API Gateway
+- ✅ Password change & security settings
+- ✅ Rate limiting
+- ✅ Health check endpoint per service
+- ✅ Email-based OTP
 
 ---
 
@@ -35,7 +40,6 @@
 - ⬜ File Service (upload, share, audit, storage tracking)
 - ⬜ Group Service (groups, access control, permissions)
 - ⬜ Chat Service (1-to-1 and group messaging)
-- ⬜ Central API Gateway
 - ⬜ Cloud-based storage integration
 - ⬜ End-to-end encrypted file transfers
 - ⬜ Advanced audit logs (GitHub-style activity)
@@ -49,8 +53,6 @@
 - ⬜ New device login detection
 - ⬜ Device verification via OTP / Email
 - ⬜ View and revoke trusted devices
-- ⬜ Email-based OTP
-- ⬜ Password change & security settings
 - ⬜ Restore previous file versions
 - ⬜ File integrity verification (SHA-256 hashing)
 - ⬜ Duplicate file detection
@@ -78,9 +80,7 @@
 - ⬜ Login attempt tracking
 - ⬜ Permission change logs
 - ⬜ Centralized error handling
-- ⬜ Rate limiting
 - ⬜ Email / notification service (Optional)
-- ⬜ Health check endpoint per service
 - ⬜ Dependency health reporting
 - ⬜ Unified API documentation
 - ⬜ Docker Compose setup
