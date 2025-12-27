@@ -1,5 +1,6 @@
 import {router, Href} from "expo-router";
 import { StyleSheet, ViewStyle, TextStyle, Pressable, Text } from "react-native";
+import { useTheme } from "../context/themeProvider";
 
 type AppButtonProps = {
   title: string;
@@ -20,6 +21,7 @@ export default function AppButton({
     style,
     textStyle
 }: AppButtonProps) {
+    const { colors } = useTheme();
     const handlePress = () => {
         if (disabled) return;
         
@@ -41,7 +43,7 @@ export default function AppButton({
                 disabled && styles.disabled,
                 style
             ]}>
-            <Text style={[styles.text, textStyle]}>{title}</Text>
+            <Text style={[styles.text, { color: colors.textSecondary }, textStyle]}>{title}</Text>
         </Pressable>
     )
 }

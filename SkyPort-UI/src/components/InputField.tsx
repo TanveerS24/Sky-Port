@@ -1,4 +1,5 @@
 import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
+import { useTheme } from "../context/themeProvider";
 
 type InputFieldProps = {
   value: string;
@@ -14,16 +15,28 @@ export default function InputField({
     onChangeText,
     placeholder,
     secureTextEntry,
-    style
+    style,
+    keyboardType
 }: InputFieldProps) {
+    const { colors } = useTheme();
     return (
         <View>
             <TextInput
                 value={value}
                 onChangeText={onChangeText}
                 placeholder={placeholder}
+                placeholderTextColor={colors.textMuted}
                 secureTextEntry={secureTextEntry}
-                style={[styles.input, style]}
+                keyboardType={keyboardType}
+                style={[
+                    styles.input, 
+                    { 
+                        borderColor: colors.borderDefault,
+                        backgroundColor: colors.bgSecondary,
+                        color: colors.textPrimary 
+                    }, 
+                    style
+                ]}
             />
         </View>
     )
@@ -32,11 +45,9 @@ export default function InputField({
 const styles = StyleSheet.create({
     input: {
         height: 40,
-        borderColor: '#5C4A46',
-        backgroundColor: '#B8A6A3',
         borderWidth: 1,
         borderRadius: 5,
         width: 250,
-        paddingBottom: 10,
+        paddingHorizontal: 10,
     }
 });

@@ -1,19 +1,26 @@
 import { Stack } from "expo-router";
+import { AuthProvider, useAuth } from "../src/context/authProvider";
+import { ThemeProvider } from "../src/context/themeProvider";
 
-const isAuthenticated = false; // Replace with actual authentication logic
-
-export default function RootLayout() {
-  if (!isAuthenticated) {
-    return (
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" options={{ title: "Auth" }} />
-      </Stack>
-    );
-  }
-
+function RootLayout() {
+  const { isAuthenticated } = useAuth();
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(app)" options={{ title: "Home" }} />
+      {!isAuthenticated ? (
+        <Stack.Screen name="(auth)" />
+      ) : (
+        <Stack.Screen name="(app)" />
+      )}
     </Stack>
+  );
+}
+
+export default function Layout() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <RootLayout />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

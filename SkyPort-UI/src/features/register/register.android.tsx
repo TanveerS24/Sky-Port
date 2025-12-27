@@ -1,7 +1,8 @@
-import {View, Text, StyleSheet, Platform} from 'react-native';
-import {LinearGradient} from 'expo-linear-gradient';
+import {View, Text, StyleSheet, Platform, Pressable} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../context/themeProvider';
 
 import AppButton from "../../components/AppButton"
 import InputField from '../../components/InputField';
@@ -9,6 +10,7 @@ import SubmitButton from '../../components/SubmitButton';
 
 
 const Register = () => {
+    const { colors, theme, toggleTheme } = useTheme();
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -26,12 +28,15 @@ const Register = () => {
     };
 
     return (
-        <LinearGradient colors={['#80F9F9FF', '#8A9E0AFF']} style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
             <SafeAreaView style={styles.container}>
-                <Text style={styles.text}>
+                <Pressable style={styles.themeToggle} onPress={toggleTheme}>
+                    <Ionicons name={theme === 'dark' ? 'sunny' : 'moon'} size={24} color={colors.textPrimary} />
+                </Pressable>
+                <Text style={[styles.text, { color: colors.headingPrimary }]}>
                     Create Account
                 </Text>
-                <Text style={styles.details}>
+                <Text style={[styles.details, { color: colors.textSecondary }]}>
                     Enter Username
                 </Text>
                 <InputField 
@@ -39,7 +44,7 @@ const Register = () => {
                     onChangeText={setUsername}
                     placeholder="Username"
                 />
-                <Text style={styles.details}>
+                <Text style={[styles.details, { color: colors.textSecondary }]}>
                     Enter Email
                 </Text>
                 <InputField 
@@ -48,7 +53,7 @@ const Register = () => {
                     placeholder="Email"
                     keyboardType="email-address"
                 />
-                <Text style={styles.details}>
+                <Text style={[styles.details, { color: colors.textSecondary }]}>
                     Enter Password
                 </Text>
                 <InputField
@@ -64,7 +69,7 @@ const Register = () => {
                 />
                 <AppButton title="Already have an account? Login" to="/(auth)/login" replace />
             </SafeAreaView>
-        </LinearGradient>
+        </View>
     );
 }
 
@@ -76,7 +81,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     text: {
-        color: '#1A1412FF',
         fontSize: 30,
         fontWeight: 'bold',
         marginBottom: 20,
@@ -87,7 +91,13 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         fontSize: 16,
         fontWeight: '500',
-        color: '#3A2F2B',
+    },
+    themeToggle: {
+        position: 'absolute',
+        top: 20,
+        right: 20,
+        zIndex: 10,
+        padding: 10,
     }
 });
 

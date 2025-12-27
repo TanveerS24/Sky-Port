@@ -1,8 +1,12 @@
-import {Redirect } from "expo-router";
+import { Redirect } from "expo-router";
+import { useAuth } from "../src/context/authProvider";
 
 export default function Index() {
-  const isLoggedIn = false; // Replace with actual auth check
+  const { isAuthenticated } = useAuth();
   
-  // Redirect to the appropriate screen based on auth state
-  return isLoggedIn ? <Redirect href="/" /> : <Redirect href="/(auth)/login" />;
+  if (isAuthenticated) {
+    return <Redirect href="/(app)/home" />;
+  }
+  
+  return <Redirect href="/(auth)/login" />;
 }

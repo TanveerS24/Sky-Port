@@ -20,6 +20,7 @@ const verifyOtpController = async (req, res) => {
     user.isVerified = true;
     await user.save();
     await OTPVerification.deleteOne({ email });
+    console.log("Email verified for user:", email);
     res.status(200).json({ message: "Email verified successfully" });
 };
 
