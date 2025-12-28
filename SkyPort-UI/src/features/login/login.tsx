@@ -3,7 +3,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useAuth } from '../../context/authProvider';
 import { useTheme } from '../../context/themeProvider';
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
 import AppButton from "../../components/AppButton"
@@ -31,16 +30,6 @@ const Login = () => {
     return (
         <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
             <SafeAreaView style={styles.container}>
-                <Pressable 
-                    style={styles.themeToggle} 
-                    onPress={toggleTheme}
-                >
-                    <Ionicons 
-                        name={theme === 'dark' ? 'sunny' : 'moon'} 
-                        size={24} 
-                        color={colors.textPrimary} 
-                    />
-                </Pressable>
                 <Text style={[styles.text, { color: colors.headingPrimary }]}>
                     Welcome Back
                 </Text>

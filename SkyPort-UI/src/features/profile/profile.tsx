@@ -9,6 +9,11 @@ const Profile = () => {
   const { colors, theme, toggleTheme } = useTheme();
   const router = useRouter();
 
+  const handleLogout = () => {
+    logout();
+    router.push('../(auth)/login');
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
       <Pressable 
@@ -43,10 +48,13 @@ const Profile = () => {
 
         <Pressable 
           style={[styles.logoutButton, { backgroundColor: colors.btnPrimaryBg }]} 
-          onPress={logout}
+          onPress={handleLogout}
         >
           <Text style={[styles.buttonText, { color: colors.btnPrimaryText }]}>Logout</Text>
         </Pressable>
+        <Text style={[styles.footerText, { color: colors.textMuted }]}>
+          Built with ♥ by SkyPort Team
+        </Text>
       </View>
     </View>
   );
@@ -106,6 +114,12 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  footerText: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 15,
+
   },
 });
 
