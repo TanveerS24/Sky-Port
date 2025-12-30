@@ -44,15 +44,15 @@ const Files = () => {
   };
     return (
         <View style={[styles.container, { backgroundColor: colors.bgPrimary }]} >
-            <Pressable style={styles.headerText} onPress={() => router.back()}>
-                <Ionicons
-                    name="arrow-back" 
-                    size={24} 
-                    color={colors.textPrimary} 
-                />
-            <Text style={{ color: colors.textPrimary }}>
-                Shared Files
-            </Text>
+            <Pressable style={styles.header} onPress={() => router.back()}>
+              <Ionicons
+                  name="arrow-back" 
+                  size={24} 
+                  color={colors.textPrimary} 
+              />
+              <Text style={[styles.headerText, { color: colors.textPrimary }]}>
+                  Shared Files
+              </Text>
             </Pressable>
         <View style={[styles.sharedFilesContainer, { backgroundColor: colors.bgSecondary }]}>
                 <View style={styles.sharedFilesList}>
@@ -72,7 +72,7 @@ const Files = () => {
                         style={styles.row}
                         onPress={() => handleItemPress(item)}
                       >
-                        <Text style={[styles.cell, styles.fileName, {color: colors.textPrimary}]}>
+                        <Text style={[styles.cell, styles.fileName, {color: colors.textSecondary}]}>
                           <Ionicons 
                             name={
                               item.type === 'back' ? "arrow-back-outline" :
@@ -102,20 +102,25 @@ const Files = () => {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    backButton: {
-    },
-    headerText: {
-        marginTop: 50,
-        marginLeft: 20,
-        marginBottom: 10,
-        flexDirection: 'row',
-        fontSize: 24,
-        fontWeight: 'bold',
-    },
-    sharedFilesContainer: {
+  container: {
+      flex: 1,
+  },
+  header: {
+    marginTop: 50,
+    marginLeft: 20,
+    marginBottom: 10,
+    flexDirection: 'row',
+    fontSize: 24,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    gap: 5,
+    fontWeight: 'bold',
+  },
+  headerText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  sharedFilesContainer: {
     marginTop: 20,
     marginHorizontal: 20,
     borderRadius: 8,
@@ -124,7 +129,6 @@ const styles = StyleSheet.create({
   sharedFilesList: {
     marginTop: 10,
     maxHeight: '70%',
-    height: 700,
     paddingHorizontal: 10,
   },
   row: {
@@ -139,6 +143,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     paddingHorizontal: 5,
+    paddingVertical: 2,
   },
   rowHeader: {
     fontWeight: 'bold',

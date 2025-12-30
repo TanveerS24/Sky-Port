@@ -19,29 +19,25 @@ export default function SubmitButton({
             disabled={disabled}
             style={[
                 styles.button, 
-                { 
-                    backgroundColor: colors.btnPrimaryBg,
-                    borderColor: colors.borderDefault 
-                },
+                { backgroundColor: colors.btnPrimaryBg },
                 disabled && { opacity: 0.5, backgroundColor: colors.borderMuted }
             ]}
         >
-            <Text style={[styles.text, { color: colors.btnPrimaryText }]}>{title}</Text>
+            <Text style={[styles.text, { color: colors.btnPrimaryText }, disabled && { color: colors.textInverse }]}>{title}</Text>
         </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
     button: {
-        paddingVertical: 7,
-        width: 100,
-        borderRadius: 5,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
         alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 10,
-        borderWidth: 1,
+        marginTop: 20,
     },
     text: {
-        fontWeight: '500',
+        fontSize: 16,
+        fontWeight: '600',
     }
 });

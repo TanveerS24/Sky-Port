@@ -38,19 +38,18 @@ export default function AppButton({
             onPress={handlePress}
             disabled={disabled}
             style={({pressed}) => [
-                styles.button,
+                [styles.button, { backgroundColor: colors.btnPrimaryBg }],
                 pressed && styles.pressed,
                 disabled && styles.disabled,
                 style
             ]}>
-            <Text style={[styles.text, { color: colors.textSecondary }, textStyle]}>{title}</Text>
+            <Text style={[styles.text, { color: colors.btnPrimaryText }, textStyle]}>{title}</Text>
         </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#2563EB',
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 10,
@@ -64,7 +63,6 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   text: {
-    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },

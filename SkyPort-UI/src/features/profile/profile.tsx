@@ -3,6 +3,8 @@ import { useAuth } from '../../context/authProvider';
 import { useTheme } from '../../context/themeProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import SubmitButton from '../../components/SubmitButton';
+
 
 const Profile = () => {
   const { logout } = useAuth();
@@ -32,26 +34,21 @@ const Profile = () => {
       <View style={styles.content}>
         <View style={[styles.card, { backgroundColor: colors.bgSecondary }]}>
           <View style={styles.cardRow}>
-            <Text style={[styles.label, { color: colors.textPrimary }]}>Theme</Text>
+            <Text style={[styles.label, { color: colors.textSecondary }]}>Theme</Text>
             <Pressable style={styles.themeToggle} onPress={toggleTheme}>
               <Ionicons 
                 name={theme === 'dark' ? 'sunny' : 'moon'} 
                 size={24} 
-                color={colors.textPrimary} 
+                color={colors.textSecondary} 
               />
-              <Text style={[styles.themeText, { color: colors.textPrimary }]}>
+              <Text style={[styles.themeText, { color: colors.textSecondary }]}>
                 {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
               </Text>
             </Pressable>
           </View>
         </View>
 
-        <Pressable 
-          style={[styles.logoutButton, { backgroundColor: colors.btnPrimaryBg }]} 
-          onPress={handleLogout}
-        >
-          <Text style={[styles.buttonText, { color: colors.btnPrimaryText }]}>Logout</Text>
-        </Pressable>
+        <SubmitButton title="Logout" onPress={handleLogout} />
         <Text style={[styles.footerText, { color: colors.textMuted }]}>
           Built with ♥ by SkyPort Team
         </Text>

@@ -40,6 +40,7 @@ const Login = () => {
                     value={username}
                     onChangeText={setUsername}
                     placeholder="Username"
+                    style={styles.inputField}
                 />
                 <Text style={[styles.details, { color: colors.textSecondary }]}>
                     Enter Password
@@ -48,6 +49,7 @@ const Login = () => {
                     value={password}
                     onChangeText={setPassword}
                     placeholder="Password"
+                    style={styles.inputField}
                     secureTextEntry
                 />
                 {isLoading && (
@@ -88,6 +90,9 @@ const styles = StyleSheet.create({
         right: 20,
         zIndex: 10,
         padding: 10,
+    },
+    inputField: {
+        borderRadius: 8,
     },
     loadingContainer: {
         marginTop: 20,

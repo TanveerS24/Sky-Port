@@ -2,7 +2,7 @@ import {Text, View, StyleSheet, Pressable, ScrollView, FlatList} from 'react-nat
 import { useTheme } from '../../context/themeProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import AppCard from '../../components/AppCard';
 
 
 const Home = () => {
@@ -16,7 +16,6 @@ const Home = () => {
         <Text style={[styles.title, { color: colors.headingPrimary }]}>Sky-Port</Text>
 
         <Pressable 
-          style={styles.profileIcon} 
           onPress={() => router.push('/profile')}
           >
           <Ionicons 
@@ -26,13 +25,14 @@ const Home = () => {
             />
         </Pressable>
       </View>
-      <Pressable
-        onPress={() => router.push('/files')}
-      >
-        <Text style={[styles.info, { color: colors.textPrimary }]}>Your Shared Files</Text>
-      </Pressable>
-
-      
+      <Text style={[styles.info, { color: colors.textSecondary }]}>Your Activities</Text>
+      <View style={styles.content}>
+        <AppCard title="Your Files" to="/files" />
+        <AppCard title="Your DashBoard" to="/dashboard" />
+        <AppCard title="Shared Files" to="/sharedFiles" />
+        <AppCard title="Your Friends" to="/friends" />
+        <AppCard title="Start a Chat" to="/chats" />
+      </View> 
     </View>
   );
 }
@@ -44,28 +44,23 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 60,
+    paddingBottom: 20,
   },
   title: {
     fontSize: 32,
-    marginBottom: 10,
     fontWeight: 'bold',
-    top: 55,
-    left: 20,
-    position: 'absolute',
   },
-  profileIcon: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    zIndex: 10,
-    padding: 10,
+  content: {
+    flex: 1,
+    marginTop: 10,
   },
   info: {
     fontSize: 16,
-    fontWeight: '600',
-    marginTop: 95,
+    fontWeight: '800',
+    marginTop: 20,
     marginLeft: 20,
   },
 });

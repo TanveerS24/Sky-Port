@@ -28,47 +28,65 @@ type Theme = {
 
 const themes: Record<ThemeName, Theme> = {
   dark: {
-    bgPrimary: "#0B1F3B",
-    bgSecondary: "#122B4D",
-    bgTertiary: "#1A3A66",
-    textPrimary: "#FFFFFF",
-    textSecondary: "#D6E0F0",
-    textMuted: "#9FB3D1",
-    textInverse: "#0B1F3B",
+    bgPrimary: "#0B0C0F",      // near-black, not blue
+    bgSecondary: "#12141A",    // elevated surfaces
+    bgTertiary: "#1A1D24",    // cards / modals
+
+    textPrimary: "#F5F7FA",    // clean white
+    textSecondary: "#B5BAC5",  // soft gray
+    textMuted: "#7B8190",      // muted neutral
+    textInverse: "#8195B0",
+
     headingPrimary: "#FFFFFF",
-    btnPrimaryBg: "#3B82F6",
-    btnPrimaryText: "#FFFFFF",
-    btnPrimaryHover: "#2563EB",
-    btnSecondaryBg: "#163A6B",
-    btnSecondaryText: "#FFFFFF",
-    borderDefault: "#1E3F6E",
-    borderMuted: "#142F52",
-    success: "#3FCF8E",
-    warning: "#F5A524",
-    error: "#E5484D",
-    info: "#5B8CFF",
+
+    btnPrimaryBg: "#F97316",   // 🔥 ember orange
+    btnPrimaryText: "#FFF7ED",
+    btnPrimaryHover: "#EA580C",
+
+    btnSecondaryBg: "#0F1115",        // blends with background
+    btnSecondaryText: "#9CA3AF",      // calm gray
+
+    borderDefault: "#23262F",
+    borderMuted: "#1A1C22",
+
+    success: "#22C55E",
+    warning: "#FACC15",
+    error: "#EF4444",
+    info: "#A855F7",           // subtle neon violet
   },
   light: {
-    bgPrimary: "#EEF4FF",
-    bgSecondary: "#E1ECFF",
-    bgTertiary: "#D6E4FF",
-    textPrimary: "#0B1F3B",
-    textSecondary: "#2C3E5E",
-    textMuted: "#6B7C99",
-    textInverse: "#FFFFFF",
-    headingPrimary: "#0B1F3B",
-    btnPrimaryBg: "#3B82F6",
-    btnPrimaryText: "#FFFFFF",
-    btnPrimaryHover: "#2563EB",
-    btnSecondaryBg: "#0B1F3B",
-    btnSecondaryText: "#FFFFFF",
-    borderDefault: "#CBD8F0",
-    borderMuted: "#DDE6F7",
-    success: "#22C55E",
-    warning: "#F59E0B",
-    error: "#DC2626",
-    info: "#2563EB",
-  },
+  /* Backgrounds */
+  bgPrimary: "#F8FAFD",      // airy white with cool tint
+  bgSecondary: "#B0EEEE",    // sky mist
+  bgTertiary: "#E3ECF7",     // card surfaces
+
+  /* Text */
+  textPrimary: "#2657C8",    // near-black graphite
+  textSecondary: "#1A395D ",  // cool gray
+  textMuted: "#64748B",      // muted slate
+  textInverse: "#FFFFFF",
+
+  headingPrimary: "#1E459F",
+
+  /* Primary Button — Sky Blue */
+  btnPrimaryBg: "#38BDF8",   // premium sky blue
+  btnPrimaryText: "#F0F9FF", // soft ice white
+  btnPrimaryHover: "#0EA5E9",
+
+  /* Secondary Button */
+  btnSecondaryBg: "#E0F2FE", // light sky fill
+  btnSecondaryText: "#075985",
+
+  /* Borders */
+  borderDefault: "#CBD5E1",
+  borderMuted: "#E2E8F0",
+
+  /* Status */
+  success: "#22C55E",
+  warning: "#F59E0B",
+  error: "#DC2626",
+  info: "#0284C7",
+}
 };
 
 type ThemeContextType = {

@@ -32,7 +32,7 @@ export default function InputField({
                     styles.input, 
                     { 
                         borderColor: colors.borderDefault,
-                        backgroundColor: colors.bgSecondary,
+                        backgroundColor: colors.bgTertiary,
                         color: colors.textPrimary 
                     }, 
                     style
