@@ -4,7 +4,7 @@ import deleteUser from '../controllers/deleteUser.controller.js';
 import editUser from '../controllers/editUser.controller.js';
 import findById from '../controllers/findById.controller.js';
 import findByEmail from '../controllers/findByEmail.controller.js';
-import healthCheck from '../middlewares/healthCheck.controller.js';
+import healthCheck from '../middlewares/healthCheck.middleware.js';
 
 const router = Router();
 

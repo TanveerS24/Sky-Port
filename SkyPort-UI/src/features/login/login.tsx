@@ -49,7 +49,7 @@ const Login = () => {
                     value={password}
                     onChangeText={setPassword}
                     placeholder="Password"
-                    style={styles.inputField}
+                    style={[styles.inputField, { color: colors.textSecondary }]}
                     secureTextEntry
                 />
                 {isLoading && (
@@ -58,7 +58,7 @@ const Login = () => {
                         <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Logging in...</Text>
                     </View>
                 )}
-                <SubmitButton onPress={handleLogin} title="Login" disabled={username === '' || password === '' || isLoading} />
+                {!isLoading && <SubmitButton onPress={handleLogin} title="Login" disabled={username === '' || password === '' || isLoading} />}
                 <AppButton title="New Here? Register now" to="/(auth)/register" replace />
             </SafeAreaView>
         </View>

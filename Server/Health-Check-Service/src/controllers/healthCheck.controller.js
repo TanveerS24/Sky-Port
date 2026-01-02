@@ -11,6 +11,7 @@ const checkServicesHealth = async (req, res) => {
     const services = [
         { name: "User Service", url: `${url}/api/user/health` },
         { name: "Auth Service", url: `${url}/api/auth/health` },
+        { name: "File Service", url: `${url}/api/files/health` }
     ];
 
     for (const service of services) {

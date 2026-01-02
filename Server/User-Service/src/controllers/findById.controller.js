@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import { decrypt } from "../utils/crypto.util.js";
 
 const findById = async (req, res) => {
+    console.log("Find User by ID endpoint Invoked");
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ message: "Not found" });
@@ -15,6 +16,7 @@ const findById = async (req, res) => {
         });
 
     } catch (err) {
+        console.error("Error finding user by ID:", err);
         return res.status(500).json({ message: err.message });
     }
 };

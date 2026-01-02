@@ -2,6 +2,7 @@ import User from '../models/user.model.js';
 import { decrypt, hashForSearch } from '../utils/crypto.util.js';
 
 const findByEmail = async (req, res) => {
+    console.log("Find By Email endpoint Invoked");
     try {
         const email = req.params.email;
         const emailHash = hashForSearch(email);
@@ -20,6 +21,7 @@ const findByEmail = async (req, res) => {
         });
 
     } catch (err) {
+        console.error(err);
         return res.status(500).json({ message: err.message });
     }
 };

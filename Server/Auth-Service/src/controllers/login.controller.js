@@ -26,6 +26,7 @@ const loginController = async (req, res) => {
     user.refreshToken.push(refreshToken);
     await user.save();
 
+    console.log('Login successful for user:', user._id);
     return res.json({ accessToken, refreshToken });
 };
 

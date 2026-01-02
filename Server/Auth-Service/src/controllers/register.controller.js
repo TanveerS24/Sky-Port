@@ -34,10 +34,12 @@ const registerController = async (req, res) => {
             });
 
         } catch (error) {
+            console.error('Failed to create user in User Service:', error);
             await authUser.findByIdAndDelete(AuthUser._id);
             return res.status(500).json({ message: 'Failed to create user in User Service' });
         }
 
+        console.log('User registered successfully:', AuthUser._id);
         return res.status(201).json({ message: 'User registered successfully' });
 
     } catch (error) {

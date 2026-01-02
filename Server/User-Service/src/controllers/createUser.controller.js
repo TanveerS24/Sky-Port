@@ -2,6 +2,7 @@ import User from '../models/user.model.js';
 import { encrypt, hashForSearch } from '../utils/crypto.util.js';
 
 const createUser = async (req, res) => {
+    console.log("Create User endpoint Invoked");
     try {
         const { username, email, devices, authUserId } = req.body;
 
@@ -26,6 +27,7 @@ const createUser = async (req, res) => {
 
         await user.save();
 
+        console.log("User created with ID:", user._id);
         return res.status(201).json({
             message: "User created successfully",
             userId: user._id
