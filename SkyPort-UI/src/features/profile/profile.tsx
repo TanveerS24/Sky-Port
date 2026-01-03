@@ -1,4 +1,4 @@
-import {Text, View, StyleSheet, Pressable} from 'react-native';
+import {Text, View, StyleSheet, Pressable, Alert} from 'react-native';
 import { useAuth } from '../../context/authProvider';
 import { useTheme } from '../../context/themeProvider';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,9 +11,12 @@ const Profile = () => {
   const { colors, theme, toggleTheme } = useTheme();
   const router = useRouter();
 
-  const handleLogout = () => {
-    logout();
-    router.push('../(auth)/login');
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error: any) {
+      Alert.alert('Logout Failed', error.message);
+    }
   };
 
   return (

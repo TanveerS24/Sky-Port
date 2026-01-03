@@ -1,7 +1,8 @@
-import {View, Text, StyleSheet, Platform, Pressable} from 'react-native';
+import {View, Text, StyleSheet, Platform, Pressable, ActivityIndicator, Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useTheme } from '../../context/themeProvider';
+import { useAuth } from '../../context/authProvider';
 
 import AppButton from "../../components/AppButton"
 import InputField from '../../components/InputField';
@@ -10,19 +11,18 @@ import SubmitButton from '../../components/SubmitButton';
 
 const Register = () => {
     const { colors, theme, toggleTheme } = useTheme();
+    const { register, isLoading } = useAuth();
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleRegister = () => {
-        const devices = [Platform.OS];
-        const registerData = {
-            username,
-            email,
-            password,
-            devices
-        };
-        console.log(registerData);
+    const handleRegister = async () => {
+        try {
+            await register(username, email, password);
+            Alert.alert('Success', 'Registration successful! Please login.');
+        } catch (error: any) {
+            Alert.alert('Registration Failed', error.message);
+        }
     };
 
     return (
@@ -57,11 +57,19 @@ const Register = () => {
                     placeholder="Password"
                     secureTextEntry
                 />
-                <SubmitButton 
-                    onPress={handleRegister} 
-                    title="Register" 
-                    disabled={username === '' || email === '' || password === ''} 
-                />
+                {isLoading && (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color={colors.btnPrimaryBg} />
+                        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Creating account...</Text>
+                    </View>
+                )}
+                {!isLoading && (
+                    <SubmitButton 
+                        onPress={handleRegister} 
+                        title="Register" 
+                        disabled={username === '' || email === '' || password === '' || isLoading} 
+                    />
+                )}
                 <AppButton title="Already have an account? Login" to="/(auth)/login" replace />
             </SafeAreaView>
         </View>
@@ -93,6 +101,14 @@ const styles = StyleSheet.create({
         right: 20,
         zIndex: 10,
         padding: 10,
+    },
+    loadingContainer: {
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 14,
     }
 });
 

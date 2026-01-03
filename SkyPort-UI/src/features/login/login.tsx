@@ -1,9 +1,8 @@
-import {View, Text, StyleSheet, Pressable, ActivityIndicator} from 'react-native';
+import {View, Text, StyleSheet, Pressable, ActivityIndicator, Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { useAuth } from '../../context/authProvider';
 import { useTheme } from '../../context/themeProvider';
-import { router } from 'expo-router';
 
 import AppButton from "../../components/AppButton"
 import InputField from '../../components/InputField';
@@ -11,20 +10,17 @@ import SubmitButton from '../../components/SubmitButton';
 
 
 const Login = () => {
-    const { login } = useAuth();
+    const { login, isLoading } = useAuth();
     const { colors, theme, toggleTheme } = useTheme();
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
     const handleLogin = async () => {
-        setIsLoading(true);
-        console.log({username, password});
-        setTimeout(() => {
-            login();
-            setIsLoading(false);
-            router.replace('/(app)/home');
-        }, 1000);
+        try {
+            await login(email, password);
+        } catch (error: any) {
+            Alert.alert('Login Failed', error.message);
+        }
     };
 
     return (
@@ -34,13 +30,14 @@ const Login = () => {
                     Welcome Back
                 </Text>
                 <Text style={[styles.details, { color: colors.textSecondary }]}>
-                    Enter Username
+                    Enter Email
                 </Text>
                 <InputField 
-                    value={username}
-                    onChangeText={setUsername}
-                    placeholder="Username"
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholder="Email"
                     style={styles.inputField}
+                    keyboardType="default"
                 />
                 <Text style={[styles.details, { color: colors.textSecondary }]}>
                     Enter Password
@@ -58,7 +55,7 @@ const Login = () => {
                         <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Logging in...</Text>
                     </View>
                 )}
-                {!isLoading && <SubmitButton onPress={handleLogin} title="Login" disabled={username === '' || password === '' || isLoading} />}
+                {!isLoading && <SubmitButton onPress={handleLogin} title="Login" disabled={email === '' || password === '' || isLoading} />}
                 <AppButton title="New Here? Register now" to="/(auth)/register" replace />
             </SafeAreaView>
         </View>

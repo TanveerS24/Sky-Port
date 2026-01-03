@@ -68,14 +68,14 @@ router.use('/files',
         changeOrigin: true,
         selfHandleResponse: false,
         router: (req) => {
-            if (!process.env.UPLOAD_SERVICE_URL) {
-                throw new Error('UPLOAD_SERVICE_URL is not defined in environment variables');
+            if (!process.env.FILE_SERVICE_URL) {
+                throw new Error('FILE_SERVICE_URL is not defined in environment variables');
             }
-            console.log('Routing to:', process.env.UPLOAD_SERVICE_URL);
-            return process.env.UPLOAD_SERVICE_URL;
+            console.log('Routing to:', process.env.FILE_SERVICE_URL);
+            return process.env.FILE_SERVICE_URL;
         },
         onProxyReq: (proxyReq, req) => {
-            console.log('Proxying request to Upload Service:', req.method, req.url);
+            console.log('Proxying request to File Service:', req.method, req.url);
             if(req.body && Object.keys(req.body).length > 0){
                 const bodyData = JSON.stringify(req.body);
                 proxyReq.setHeader('Content-Type', 'application/json');
