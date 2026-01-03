@@ -1,7 +1,7 @@
 import {Router} from 'express';
 import upload from '../middlewares/multer.middleware.js';
 import uploadFile from '../controllers/upload.controller.js';
-import healthCheck from '../controllers/health.controller.js';
+import healthCheck from '../middlewares/healthCheck.middleware.js';
 
 const router = Router();
 

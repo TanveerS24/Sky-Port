@@ -14,6 +14,7 @@ const logoutController = async (req, res) => {
 
         // Verify and decode the token to get user ID
         const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+        console.log('Decoded token:', decoded);
         const userId = decoded.id;
 
         // Clear all refresh tokens for this user

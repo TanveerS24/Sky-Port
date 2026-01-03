@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import { encrypt, decrypt } from "../utils/crypto.util.js";
 
 const editUser = async (req, res) => {
     console.log("Edit User controller invoked");
@@ -8,7 +9,7 @@ const editUser = async (req, res) => {
 
         console.log("Updates received: ", updates);
 
-        const allowedEdits = ['username', 'email'];
+        const allowedEdits = ['username'];
 
         Object.keys(updates).forEach((key) => {
             if (!allowedEdits.includes(key)) {
@@ -16,14 +17,26 @@ const editUser = async (req, res) => {
             }
         });
 
-        const updatedUser = await User.findByIdAndUpdate(id, updates,{$set: updates}, { new: true, runValidators: true });
+        // Encrypt username before saving
+        if (updates.username) {
+            updates.username = encrypt(updates.username);
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(id, {$set: updates}, { new: true, runValidators: true });
 
         if(!updatedUser){
             console.log("User doesn't Exist");
-            res.status(404).json({message:"User doesn't Exist"});
+            return res.status(404).json({message:"User doesn't Exist"});
         }
 
-        return res.status(200).json({ message: 'User updated successfully', user: updatedUser });
+        // Decrypt sensitive fields before returning
+        const responseUser = {
+            ...updatedUser._doc,
+            username: decrypt(updatedUser.username),
+            email: decrypt(updatedUser.email)
+        };
+
+        return res.status(200).json({ message: 'User updated successfully', user: responseUser });
 
     } catch (error) {
         console.error("Error updating user: ", error);

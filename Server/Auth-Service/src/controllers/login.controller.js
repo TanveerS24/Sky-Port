@@ -27,7 +27,7 @@ const loginController = async (req, res) => {
     await user.save();
 
     console.log('Login successful for user:', user._id);
-    return res.json({ accessToken });
+    return res.json({ accessToken, refreshToken });
 };
 
 export default loginController;

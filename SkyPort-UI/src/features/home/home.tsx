@@ -3,27 +3,30 @@ import { useTheme } from '../../context/themeProvider';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AppCard from '../../components/AppCard';
+import { useAuth } from '../../context/authProvider';
 
 
 const Home = () => {
   const { colors } = useTheme();
   const router = useRouter();
+  const { user } = useAuth();
   
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.headingPrimary }]}>Sky-Port</Text>
-
-        <Pressable 
-          onPress={() => router.push('/profile')}
-          >
-          <Ionicons 
-            name="person-circle-outline" 
-            size={32} 
-            color={colors.textPrimary} 
-            />
-        </Pressable>
+          <Pressable 
+            onPress={() => router.push('/profile')}
+            style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
+            >
+            <Text style={[styles.username, { color: colors.headingPrimary }]}>{user?.username || 'User'}</Text>
+            <Ionicons 
+              name="person-circle-outline" 
+              size={32} 
+              color={colors.textPrimary} 
+              />
+          </Pressable>
       </View>
       <Text style={[styles.info, { color: colors.textSecondary }]}>Your Activities</Text>
       <View style={styles.content}>
@@ -56,6 +59,10 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     marginTop: 10,
+  },
+  username: {
+    fontSize: 18,
+    fontWeight: '600',
   },
   info: {
     fontSize: 16,
