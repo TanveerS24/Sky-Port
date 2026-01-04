@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
-import { AuthProvider, useAuth } from "../src/context/authProvider";
-import { ThemeProvider } from "../src/context/themeProvider";
+import { AuthProvider, useAuth } from "../src/context/authProvider.context";
+import { UserProvider } from "../src/context/user.context";
+import { ThemeProvider } from "../src/context/themeProvider.context";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 
 function RootLayout() {
@@ -29,7 +30,9 @@ export default function Layout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <RootLayout />
+        <UserProvider>
+          <RootLayout />
+        </UserProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -1,5 +1,5 @@
 import {View, Text, Pressable, StyleSheet, FlatList} from 'react-native';
-import { useTheme } from '../../context/themeProvider';
+import { useTheme } from '../../context/themeProvider.context';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { useRouter } from 'expo-router';

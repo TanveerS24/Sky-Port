@@ -1,6 +1,6 @@
 import {View, Text, Pressable, StyleSheet, ViewStyle, TextStyle} from 'react-native';
 import { Href, router } from 'expo-router';
-import { useTheme } from '../context/themeProvider';
+import { useTheme } from '../context/themeProvider.context';
 
 type AppCardProps = {
     title: string;

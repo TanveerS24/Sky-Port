@@ -1,31 +1,130 @@
-import {Text, View, StyleSheet, Pressable, Alert, TextInput} from 'react-native';
-import { useAuth } from '../../context/authProvider';
-import { useTheme } from '../../context/themeProvider';
+import {Text, View, StyleSheet, Pressable, Alert, TextInput, ActivityIndicator} from 'react-native';
+import { useAuth } from '../../context/authProvider.context';
+import { useTheme } from '../../context/themeProvider.context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import SubmitButton from '../../components/SubmitButton';
-import { useState, useEffect } from 'react';
+import { useUser } from '../../context/user.context';
+import { useState, useEffect, useRef } from 'react';
 
 
 const Profile = () => {
-  const { logout, user, updateUser } = useAuth();
+  const { logout, verifiedStatus, sendOTP, verifyEmailOTP } = useAuth();
+  const {user, updateUser} = useUser();
   const { colors, theme, toggleTheme } = useTheme();
   const router = useRouter();
   
   const [username, setUsername] = useState('');
   const [isEditMode, setIsEditMode] = useState(false);
+  const [verified, setVerified] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // OTP verification states
+  const [showOTPSection, setShowOTPSection] = useState(false);
+  const [isSendingOTP, setIsSendingOTP] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [isVerifyingOTP, setIsVerifyingOTP] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+  const otpInputs = useRef<Array<TextInput | null>>([]);
+  
+  // Timer effect for resend button
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendTimer]);
 
   useEffect(() => {
     if (user?.username) {
       setUsername(user.username);
     }
-  }, [user]);
+    if(user?.email) {
+      verifiedStatus(user.email).then((status) => setVerified(status));
+    }
+  }, [user, verifiedStatus]);
 
   useEffect(() => {
     setHasChanges(username !== user?.username && username.trim() !== '');
   }, [username, user?.username]);
+
+  // Auto-verify when all OTP fields are filled
+  useEffect(() => {
+    const otpComplete = otp.every(digit => digit !== '');
+    if (otpComplete && !isVerifyingOTP && otpSent) {
+      handleVerifyOTP();
+    }
+  }, [otp, otpSent, isVerifyingOTP]);
+
+  const handleSendOTP = async () => {
+    if (!user?.email || !sendOTP) return;
+    
+    try {
+      setIsSendingOTP(true);
+      await sendOTP(user.email);
+      setOtpSent(true);
+      setResendTimer(60);
+      Alert.alert('Success', 'OTP sent to your email!');
+    } catch (error: any) {
+      Alert.alert('Error', error.message || 'Failed to send OTP');
+    } finally {
+      setIsSendingOTP(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (!user?.email || !verifyEmailOTP) return;
+    
+    const otpCode = otp.join('');
+    if (otpCode.length !== 6) return;
+
+    try {
+      setIsVerifyingOTP(true);
+      await verifyEmailOTP(user.email, otpCode);
+      Alert.alert('Success', 'Email verified successfully!');
+      setVerified(true);
+      setShowOTPSection(false);
+      setOtpSent(false);
+      setOtp(['', '', '', '', '', '']);
+    } catch (error: any) {
+      Alert.alert('Verification Failed', error.message || 'Invalid OTP');
+      setIsVerifyingOTP(false);
+    }
+  };
+
+  const handleOTPChange = (value: string, index: number) => {
+    if (isNaN(Number(value)) && value !== '') return;
+    
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value !== '' && index < 5) {
+      otpInputs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOTPKeyPress = (e: any, index: number) => {
+    if (e.nativeEvent.key === 'Backspace' && otp[index] === '' && index > 0) {
+      otpInputs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleTryAgain = () => {
+    setOtp(['', '', '', '', '', '']);
+    setIsVerifyingOTP(false);
+    otpInputs.current[0]?.focus();
+  };
+
+  const handleResendOTP = async () => {
+    if (resendTimer > 0) return;
+    setOtp(['', '', '', '', '', '']);
+    setIsVerifyingOTP(false);
+    await handleSendOTP();
+  };
 
   const handleEditUsername = () => {
     setIsEditMode(true);
@@ -146,6 +245,141 @@ const Profile = () => {
           </View>
         )}
 
+        {!verified ? <Pressable
+          style={[styles.verifyEmailCard, { backgroundColor: colors.bgSecondary }]}
+          onPress={() => setShowOTPSection(!showOTPSection)}
+        >
+          <View style={styles.verifyEmailContent}>
+            <Ionicons name="mail-outline" size={24} color={colors.textPrimary} />
+            <View style={styles.verifyTextContainer}>
+              <Text style={[styles.verifyTitle, { color: colors.textPrimary }]}>
+                Verify your email
+              </Text>
+              <Text style={[styles.verifySubtitle, { color: colors.textSecondary }]}>
+                Unlock more features by verifying your email
+              </Text>
+            </View>
+            <Ionicons 
+              name={showOTPSection ? "chevron-up" : "chevron-down"} 
+              size={24} 
+              color={colors.textSecondary} 
+            />
+          </View>
+        </Pressable> : (
+          <View style={[styles.verifyEmailCard, { backgroundColor: colors.bgSecondary }]}>
+            <View style={styles.verifyEmailContent}>
+              <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
+              <View style={styles.verifyTextContainer}>
+                <Text style={[styles.verifyTitle, { color: colors.textPrimary }]}>
+                  Account Verified
+                </Text>
+                <Text style={[styles.verifySubtitle, { color: colors.textSecondary }]}>
+                  Enjoy all our services
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+        
+
+        {/* OTP Verification Section */}
+        {!verified && showOTPSection && (
+          <View style={[styles.otpCard, { backgroundColor: colors.bgSecondary }]}>
+            {!otpSent ? (
+              // Send OTP Button
+              <View style={styles.otpInitialState}>
+                <Text style={[styles.otpInstructions, { color: colors.textSecondary }]}>
+                  Click the button below to receive a verification code via email
+                </Text>
+                <Pressable
+                  style={[styles.sendOtpButton, { backgroundColor: colors.btnPrimaryBg }]}
+                  onPress={handleSendOTP}
+                  disabled={isSendingOTP}
+                >
+                  {isSendingOTP ? (
+                    <ActivityIndicator size="small" color="#fff" />
+                  ) : (
+                    <Text style={styles.sendOtpButtonText}>Send OTP</Text>
+                  )}
+                </Pressable>
+              </View>
+            ) : (
+              // OTP Input Section
+              <View style={styles.otpInputSection}>
+                <Text style={[styles.otpInstructions, { color: colors.textSecondary }]}>
+                  Enter the 6-digit code sent to {user?.email}
+                </Text>
+                
+                <View style={styles.otpInputsContainer}>
+                  {otp.map((digit, index) => (
+                    <TextInput
+                      key={index}
+                      ref={(ref) => { otpInputs.current[index] = ref; }}
+                      style={[
+                        styles.otpInput,
+                        { 
+                          borderColor: colors.textMuted,
+                          color: colors.textPrimary,
+                          backgroundColor: colors.bgPrimary
+                        }
+                      ]}
+                      value={digit}
+                      onChangeText={(value) => handleOTPChange(value, index)}
+                      onKeyPress={(e) => handleOTPKeyPress(e, index)}
+                      keyboardType="number-pad"
+                      maxLength={1}
+                      selectTextOnFocus
+                      editable={!isVerifyingOTP}
+                    />
+                  ))}
+                </View>
+
+                {isVerifyingOTP && (
+                  <View style={styles.verifyingContainer}>
+                    <ActivityIndicator size="small" color={colors.textPrimary} />
+                    <Text style={[styles.verifyingText, { color: colors.textSecondary }]}>
+                      Verifying...
+                    </Text>
+                  </View>
+                )}
+
+                {/* Action Buttons */}
+                <View style={styles.otpActionsContainer}>
+                  <Pressable
+                    style={[
+                      styles.otpActionButton,
+                      { backgroundColor: colors.bgPrimary },
+                      isVerifyingOTP && styles.disabledButton
+                    ]}
+                    onPress={handleTryAgain}
+                    disabled={isVerifyingOTP}
+                  >
+                    <Text style={[styles.otpActionButtonText, { color: colors.textPrimary }]}>
+                      Try Again
+                    </Text>
+                  </Pressable>
+
+                  <Pressable
+                    style={[
+                      styles.otpActionButton,
+                      { backgroundColor: colors.bgPrimary },
+                      (resendTimer > 0 || isVerifyingOTP) && styles.disabledButton
+                    ]}
+                    onPress={handleResendOTP}
+                    disabled={resendTimer > 0 || isVerifyingOTP}
+                  >
+                    <Text style={[
+                      styles.otpActionButtonText,
+                      { color: resendTimer > 0 ? colors.textMuted : colors.textPrimary }
+                    ]}>
+                      {resendTimer > 0 ? `Resend (${resendTimer}s)` : 'Send OTP Again'}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
+          </View>
+        )}
         {/* Change Password Button */}
         <Pressable 
           style={[styles.changePasswordButton, { backgroundColor: colors.bgSecondary }]} 
@@ -306,7 +540,94 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginTop: 15,
-
+  },
+  verifyEmailCard: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  verifyEmailContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  verifyTextContainer: {
+    flex: 1,
+  },
+  verifyTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  verifySubtitle: {
+    fontSize: 13,
+  },
+  otpCard: {
+    borderRadius: 12,
+    padding: 20,
+    marginBottom: 20,
+  },
+  otpInitialState: {
+    alignItems: 'center',
+    gap: 20,
+  },
+  otpInstructions: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  sendOtpButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 10,
+    minWidth: 150,
+    alignItems: 'center',
+  },
+  sendOtpButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  otpInputSection: {
+    alignItems: 'center',
+    gap: 20,
+  },
+  otpInputsContainer: {
+    flexDirection: 'row',
+    gap: 10,
+    justifyContent: 'center',
+  },
+  otpInput: {
+    width: 45,
+    height: 55,
+    borderWidth: 2,
+    borderRadius: 10,
+    fontSize: 24,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  verifyingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  verifyingText: {
+    fontSize: 14,
+  },
+  otpActionsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  otpActionButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  otpActionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

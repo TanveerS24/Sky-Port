@@ -1,5 +1,5 @@
 import { Redirect } from "expo-router";
-import { useAuth } from "../src/context/authProvider";
+import { useAuth } from "../src/context/authProvider.context";
 
 export default function Index() {
   const { isAuthenticated } = useAuth();

@@ -1,8 +1,8 @@
 import {View, Text, StyleSheet, Platform, Pressable, ActivityIndicator, Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
-import { useTheme } from '../../context/themeProvider';
-import { useAuth } from '../../context/authProvider';
+import { useTheme } from '../../context/themeProvider.context';
+import { useAuth } from '../../context/authProvider.context';
 
 import AppButton from "../../components/AppButton"
 import InputField from '../../components/InputField';

@@ -1,5 +1,5 @@
 import { Pressable, Text, StyleSheet } from "react-native";
-import { useTheme } from "../context/themeProvider";
+import { useTheme } from "../context/themeProvider.context";
 
 type SubmitButtonProps = {
   title: string;
