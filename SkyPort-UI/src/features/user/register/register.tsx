@@ -1,12 +1,12 @@
 import {View, Text, StyleSheet, Platform, Pressable, ActivityIndicator, Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
-import { useTheme } from '../../context/themeProvider.context';
-import { useAuth } from '../../context/authProvider.context';
+import { useTheme } from '../../../context/themeProvider.context';
+import { useAuth } from '../../../context/authProvider.context';
 
-import AppButton from "../../components/AppButton"
-import InputField from '../../components/InputField';
-import SubmitButton from '../../components/SubmitButton';
+import AppButton from "../../../components/AppButton"
+import InputField from '../../../components/InputField';
+import SubmitButton from '../../../components/SubmitButton';
 
 
 const Register = () => {

@@ -1,10 +1,10 @@
 import {Text, View, StyleSheet, Pressable, ScrollView, FlatList} from 'react-native';
-import { useTheme } from '../../context/themeProvider.context';
+import { useTheme } from '../../../context/themeProvider.context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import AppCard from '../../components/AppCard';
-import { useAuth } from '../../context/authProvider.context';
-import { useUser } from '../../context/user.context';
+import AppCard from '../../../components/AppCard';
+import { useAuth } from '../../../context/authProvider.context';
+import { useUser } from '../../../context/user.context';
 
 const Home = () => {
   const { colors } = useTheme();

@@ -1,10 +1,12 @@
 import User from '../models/user.model.js';
+import UserTypes from '../models/userTypes.model.js';
 import { encrypt, hashForSearch } from '../utils/crypto.util.js';
 
 const createUser = async (req, res) => {
     console.log("Create User endpoint Invoked");
     try {
         const { username, email, devices, authUserId } = req.body;
+        const defaultUserType = await UserTypes.findOne({ type: 'user' });
 
         if (!username || !email || !authUserId) {
             return res.status(400).json({ message: "Missing fields" });
@@ -22,6 +24,7 @@ const createUser = async (req, res) => {
             email: encrypt(email),
             emailHash,
             devices,
+            type: defaultUserType._id,
             authUserId
         });
 

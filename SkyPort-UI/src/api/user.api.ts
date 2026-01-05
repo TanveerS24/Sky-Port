@@ -1,8 +1,10 @@
 import http from './http.api';
-import { saveToSecureStore, getFromSecureStore, deleteFromSecureStore } from '../utils/secureStore.util';
+import { saveToSecureStore } from '../utils/secureStore.util';
 
 export const getUserByEmail = async (email: string) => {
+    console.log('getUserByEmail API called with email:', email);
     const response = await http.get(`/user/findbyemail/${email}`);
+    console.log('API response:', response.data);
     await saveToSecureStore('userEmail', email);
     await saveToSecureStore('userId', response.data.user._id);
     return response.data.user;

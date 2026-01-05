@@ -1,6 +1,7 @@
 import {createContext, useContext, useState, ReactNode, useEffect } from "react";
 import {getFromSecureStore} from "../utils/secureStore.util";
 import {getUserByEmail, editUser as editUserApi} from '../api/user.api';
+import {useAuth} from './authProvider.context';
 
 type User = {
     _id: string;
@@ -9,6 +10,7 @@ type User = {
     emailHash: string;
     devices: any[];
     isActive: boolean;
+    type: string;
     authUserId: string;
     createdAt: string;
     updatedAt: string;
@@ -18,6 +20,7 @@ type UserContextType = {
     user: User | null;
     isLoading: boolean;
     error: string | null;
+    usertype: string;
     updateUser: (updates: { username: string }) => Promise<void>;
     refreshUser: () => Promise<void>;
 };
@@ -25,13 +28,19 @@ type UserContextType = {
 const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+    const { isAuthenticated } = useAuth();
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [usertype, setUsertype] = useState("user");
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        userDetails();
-    }, []);
+        if (isAuthenticated) {
+            userDetails();
+        } else {
+            setIsLoading(false);
+        }
+    }, [isAuthenticated]);
 
     const userDetails = async () => {
         try {
@@ -40,9 +49,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             if (email) {
                 const userData = await getUserByEmail(email);
                 setUser(userData);
+                setUsertype(userData?.type?.type || "user");
+            } else {
+                console.log('No email found in secure store');
             }
             setIsLoading(false);
         } catch (error: any) {
+            console.error('Error in userDetails:', error);
             setError(error.message);
             setIsLoading(false);
         }
@@ -64,7 +77,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <UserContext.Provider value={{ user, isLoading, error, updateUser, refreshUser: userDetails }}>
+        <UserContext.Provider value={{ user, isLoading, error, usertype, updateUser, refreshUser: userDetails }}>
             {children}
         </UserContext.Provider>
     );

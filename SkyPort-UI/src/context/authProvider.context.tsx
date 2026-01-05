@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             await saveToSecureStore('userEmail', email);
             
             setIsAuthenticated(true);
-            router.replace('/(app)/home');
+            // Navigation will be handled by the layout based on usertype from UserProvider
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || 'An error occurred during login';
             setError(errorMessage);

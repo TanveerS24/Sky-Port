@@ -1,16 +1,16 @@
 import {Text, View, StyleSheet, Pressable, Alert, TextInput, ActivityIndicator} from 'react-native';
-import { useAuth } from '../../context/authProvider.context';
-import { useTheme } from '../../context/themeProvider.context';
+import { useAuth } from '../../../context/authProvider.context';
+import { useTheme } from '../../../context/themeProvider.context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import SubmitButton from '../../components/SubmitButton';
-import { useUser } from '../../context/user.context';
+import SubmitButton from '../../../components/SubmitButton';
+import { useUser } from '../../../context/user.context';
 import { useState, useEffect, useRef } from 'react';
 
 
 const Profile = () => {
   const { logout, verifiedStatus, sendOTP, verifyEmailOTP } = useAuth();
-  const {user, updateUser} = useUser();
+  const {user, usertype, updateUser} = useUser();
   const { colors, theme, toggleTheme } = useTheme();
   const router = useRouter();
   
@@ -41,10 +41,15 @@ const Profile = () => {
     if (user?.username) {
       setUsername(user.username);
     }
-    if(user?.email) {
-      verifiedStatus(user.email).then((status) => setVerified(status));
+    if(user?.email && verifiedStatus) {
+      verifiedStatus(user.email)
+        .then((status) => setVerified(status))
+        .catch((error) => {
+          console.error('Error checking verification status:', error);
+          setVerified(false);
+        });
     }
-  }, [user, verifiedStatus]);
+  }, [user?.email, user?.username]);
 
   useEffect(() => {
     setHasChanges(username !== user?.username && username.trim() !== '');
@@ -83,14 +88,25 @@ const Profile = () => {
     try {
       setIsVerifyingOTP(true);
       await verifyEmailOTP(user.email, otpCode);
-      Alert.alert('Success', 'Email verified successfully!');
       setVerified(true);
       setShowOTPSection(false);
       setOtpSent(false);
       setOtp(['', '', '', '', '', '']);
+      Alert.alert('Success', 'Email verified successfully!');
     } catch (error: any) {
-      Alert.alert('Verification Failed', error.message || 'Invalid OTP');
-      setIsVerifyingOTP(false);
+      const errorMessage = error.message || 'Invalid OTP';
+      
+      // Handle specific errors gracefully
+      if (errorMessage.includes('Invalid OTP') || errorMessage.includes('OTP')) {
+        Alert.alert('Invalid OTP', 'Please check the code and try again.');
+        handleTryAgain();
+      } else if (errorMessage.includes('rate') || errorMessage.includes('Too many')) {
+        Alert.alert('Too Many Requests', 'Please wait a moment before trying again.');
+        setIsVerifyingOTP(false);
+      } else {
+        Alert.alert('Verification Failed', errorMessage);
+        setIsVerifyingOTP(false);
+      }
     }
   };
 
@@ -176,7 +192,7 @@ const Profile = () => {
         />
       </Pressable>
 
-      <Text style={[styles.title, { color: colors.headingPrimary }]}>Profile</Text>
+      <Text style={[styles.title, { color: colors.headingPrimary }]}>{usertype}</Text>
 
       <View style={styles.content}>
         {/* User Information Card */}
@@ -250,7 +266,7 @@ const Profile = () => {
           onPress={() => setShowOTPSection(!showOTPSection)}
         >
           <View style={styles.verifyEmailContent}>
-            <Ionicons name="mail-outline" size={24} color={colors.textPrimary} />
+            <Ionicons name="warning" size={24} color={colors.warning} />
             <View style={styles.verifyTextContainer}>
               <Text style={[styles.verifyTitle, { color: colors.textPrimary }]}>
                 Verify your email
@@ -268,7 +284,7 @@ const Profile = () => {
         </Pressable> : (
           <View style={[styles.verifyEmailCard, { backgroundColor: colors.bgSecondary }]}>
             <View style={styles.verifyEmailContent}>
-              <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
+              <Ionicons name="checkmark-circle" size={24} color={colors.success} />
               <View style={styles.verifyTextContainer}>
                 <Text style={[styles.verifyTitle, { color: colors.textPrimary }]}>
                   Account Verified
