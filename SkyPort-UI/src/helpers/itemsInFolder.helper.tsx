@@ -23,24 +23,32 @@ const getItemsInFolder = (files: FileItem[], currentFolder: string | null) => {
 
     files.forEach((file: FileItem) => {
         const path = file.fileLocation.folder;
-        const pathParts = path.split('/');
+        const pathParts = path === 'root' ? [] : path.split('/');
 
         if(!currentFolder) {
-            if(pathParts.length === 1) {
+            // At root level
+            if(pathParts.length === 0) {
                 visibleItems.push(file);
             } else {
                 folders.add(pathParts[0]);
             }
             return;
         }
-        if(path.startsWith(currentFolder+'/')) {
-            const rest = path.replace(currentFolder+'/', '');
-            const restParts = rest.split('/');
-
-            if(restParts.length === 1) {
+        
+        // Check if file is in current folder
+        if(path === currentFolder || path.startsWith(currentFolder+'/')) {
+            if(path === currentFolder) {
+                // File directly in this folder
                 visibleItems.push(file);
             } else {
-                folders.add(restParts[0]);
+                // File in a subfolder
+                const rest = path.replace(currentFolder+'/', '');
+                const restParts = rest.split('/');
+                if(restParts.length === 1) {
+                    visibleItems.push(file);
+                } else {
+                    folders.add(restParts[0]);
+                }
             }
         }
     });

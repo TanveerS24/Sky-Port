@@ -1,5 +1,5 @@
 import {createContext, useContext, useState, ReactNode, useEffect } from "react";
-import {getFromSecureStore} from "../utils/secureStore.util";
+import {getFromSecureStore, saveToSecureStore} from "../utils/secureStore.util";
 import {getUserByEmail, editUser as editUserApi} from '../api/user.api';
 import {useAuth} from './authProvider.context';
 
@@ -49,6 +49,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
             if (email) {
                 const userData = await getUserByEmail(email);
                 setUser(userData);
+                await saveToSecureStore('userId', userData._id);
                 setUsertype(userData?.type?.type || "user");
             } else {
                 console.log('No email found in secure store');

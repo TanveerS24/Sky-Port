@@ -1,102 +1,185 @@
-import {View, Text, Pressable, StyleSheet, FlatList} from 'react-native';
+import {View, Text, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
 import { useTheme } from '../../../context/themeProvider.context';
-import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
-import files from '../../../testData/Files';
 import getItemsInFolder from '../../../helpers/itemsInFolder.helper';
+import { getFiles } from '../../../api/files.api';
+import { FileHeader } from '../../../components/FileHeader';
+import { FileRow } from '../../../components/FileRow';
+import { FilePreviewModal } from '../../../components/FilePreviewModal';
+
+interface CloudFile {
+  cloudinary: {
+    publicId: string;
+    url: string;
+  };
+  fileId: string;
+  fileName: string;
+  mimeType: string;
+  folder: string;
+  sharedWith: string[];
+  createdAt: string;
+  _id: string;
+}
+
+interface TransformedFile {
+  oid: string;
+  name: string;
+  uploadedBy: string;
+  fileLocation: { folder: string };
+  size: string;
+  uploadedAt: string;
+  cloudinaryUrl: string;
+  mimeType: string;
+  type: 'file';
+}
 
 const Files = () => {
     const { colors } = useTheme();
     const [currentFolder, setCurrentFolder] = useState<string | null>(null);
+    const [filesData, setFilesData] = useState<TransformedFile[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<TransformedFile | null>(null);
+    const [previewModalVisible, setPreviewModalVisible] = useState(false);
     const router = useRouter();
 
-  const { folders, files: visibleFiles } = getItemsInFolder(files, currentFolder);
+    useEffect(() => {
+      fetchFiles();
+    }, []);
+
+    const fetchFiles = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const cloudFiles = await getFiles({});
+        
+        console.log('Cloud files response:', cloudFiles);
+        
+        if (!cloudFiles || !Array.isArray(cloudFiles)) {
+          console.warn('Invalid response format, expected array:', cloudFiles);
+          setFilesData([]);
+          return;
+        }
+
+        // Transform cloud files to match helper format
+        const transformed = cloudFiles.map((file: CloudFile) => {
+          // Remove 'skyport' prefix and handle path correctly
+          let folderPath = file.folder;
+          if (folderPath === 'skyport') {
+            folderPath = 'root';
+          } else if (folderPath.startsWith('skyport/')) {
+            folderPath = folderPath.substring(8); // Remove 'skyport/' prefix
+          }
+
+          return {
+            oid: file._id,
+            name: file.fileName,
+            uploadedBy: 'You',
+            fileLocation: { 
+              folder: folderPath
+            },
+            size: '-',
+            uploadedAt: new Date(file.createdAt).toLocaleDateString(),
+            cloudinaryUrl: file.cloudinary.url,
+            mimeType: file.mimeType,
+            type: 'file' as const,
+          };
+        });
+        
+        console.log('Transformed files:', transformed);
+        setFilesData(transformed);
+      } catch (err: any) {
+        console.error('Error fetching files:', err);
+        console.error('Error response:', err.response?.data);
+        setError(err.response?.data?.message || 'Failed to load files');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+  const { folders, files: visibleFiles } = getItemsInFolder(filesData, currentFolder);
   const allItems = [...folders, ...visibleFiles];
   
-  // Add back navigation item if not at root
-  const itemsWithBack = currentFolder 
-    ? [{ type: 'back' as const, name: '..', id: 'back' }, ...allItems]
-    : allItems;
-  
-  const handleItemPress = (item: any) => {
-    if (item.type === 'back') {
-      // Go back to parent folder
-      const pathParts = currentFolder?.split('/');
-      if (pathParts && pathParts.length > 1) {
+  const handleBackPress = () => {
+    if (currentFolder) {
+      const pathParts = currentFolder.split('/');
+      if (pathParts.length > 1) {
         setCurrentFolder(pathParts.slice(0, -1).join('/'));
       } else {
         setCurrentFolder(null);
       }
-    } else if (item.type === 'folder') {
-      // Navigate into folder
+    } else {
+      router.back();
+    }
+  };
+
+  const handleItemPress = (item: any) => {
+    if (item.type === 'folder') {
       const newPath = currentFolder ? `${currentFolder}/${item.name}` : item.name;
       setCurrentFolder(newPath);
+    } else {
+      setSelectedFile(item);
+      setPreviewModalVisible(true);
     }
-    // Files don't do anything for now
   };
-  const emptyFiles =() => {
+
+  const emptyFiles = () => {
+    if (loading) {
+      return (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color={colors.btnPrimaryBg} />
+          <Text style={{ color: colors.textSecondary, marginTop: 10 }}>Loading files...</Text>
+        </View>
+      );
+    }
+
+    if (error) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={{ color: colors.error, marginBottom: 10 }}>{error}</Text>
+        </View>
+      );
+    }
+
     return (
-      <View>
-        <Text style={{ color: colors.textPrimary }}>You can see your shared folders here</Text>
+      <View style={styles.emptyContainer}>
+        <Text style={{ color: colors.textSecondary }}>No files in this folder</Text>
       </View>
-    )
+    );
   };
+
     return (
         <View style={[styles.container, { backgroundColor: colors.bgPrimary }]} >
-            <Pressable style={styles.header} onPress={() => router.back()}>
-              <Ionicons
-                  name="arrow-back" 
-                  size={24} 
-                  color={colors.textPrimary} 
-              />
-              <Text style={[styles.headerText, { color: colors.textPrimary }]}>
-                  Shared Files
-              </Text>
-            </Pressable>
-        <View style={[styles.sharedFilesContainer, { backgroundColor: colors.bgSecondary }]}>
-                <View style={styles.sharedFilesList}>
-                  <View style={styles.row}>
-                    <Text style={[styles.cell, styles.rowHeader, styles.fileName, {color: colors.textPrimary}]}>File Name</Text>
-                    <Text style={[styles.cell, styles.rowHeader, {color: colors.textPrimary}]}>Uploaded By</Text>
-                    <Text style={[styles.cell, styles.rowHeader, {color: colors.textPrimary}]}>Size</Text>
-                    <Text style={[styles.cell, styles.rowHeader, {color: colors.textPrimary}]}>Uploaded At</Text>
-                  </View>
-                  
-                  <FlatList
-                    data={itemsWithBack}
-                    keyExtractor={(item) => item.type === 'folder' || item.type === 'back' ? item.id : item.oid}
-                    ListEmptyComponent={emptyFiles}
-                    renderItem={({ item }) => (
-                      <Pressable 
-                        style={styles.row}
-                        onPress={() => handleItemPress(item)}
-                      >
-                        <Text style={[styles.cell, styles.fileName, {color: colors.textSecondary}]}>
-                          <Ionicons 
-                            name={
-                              item.type === 'back' ? "arrow-back-outline" :
-                              item.type === 'folder' ? "folder-open-outline" : "document-outline"
-                            } 
-                            size={16} 
-                            color={colors.textMuted }
-                          />
-                          {'  '}{item.name}
-                        </Text>
-                        <Text style={[styles.cell, {color: colors.textPrimary}]}>
-                          {item.type === 'file' ? item.uploadedBy : '-'}
-                        </Text>
-                        <Text style={[styles.cell, {color: colors.textPrimary}]}>
-                          {item.type === 'file' ? item.size : '-'}
-                        </Text>
-                        <Text style={[styles.cell, {color: colors.textPrimary}]}>
-                          {item.type === 'file' ? item.uploadedAt : '-'}
-                        </Text>
-                      </Pressable>
-                    )}
+            <FileHeader 
+              currentFolder={currentFolder}
+              onBack={handleBackPress}
+              colors={colors}
+            />
+
+            <View style={[styles.filesContainer, { backgroundColor: colors.bgSecondary }]}>
+              <FlatList
+                data={allItems}
+                keyExtractor={(item) => item.type === 'folder' ? item.id : item.oid}
+                ListEmptyComponent={emptyFiles}
+                scrollEnabled={true}
+                renderItem={({ item }) => (
+                  <FileRow 
+                    item={item}
+                    colors={colors}
+                    onPress={handleItemPress}
                   />
-                </View>
-              </View>
+                )}
+              />
+            </View>
+
+            <FilePreviewModal
+              visible={previewModalVisible}
+              selectedFile={selectedFile}
+              onClose={() => setPreviewModalVisible(false)}
+              allFiles={visibleFiles}
+              colors={colors}
+            />
         </View>
     );
 }
@@ -105,53 +188,19 @@ const styles = StyleSheet.create({
   container: {
       flex: 1,
   },
-  header: {
-    marginTop: 50,
-    marginLeft: 20,
-    marginBottom: 10,
-    flexDirection: 'row',
-    fontSize: 24,
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    gap: 5,
-    fontWeight: 'bold',
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  sharedFilesContainer: {
-    marginTop: 20,
+  filesContainer: {
+    flex: 1,
     marginHorizontal: 20,
-    borderRadius: 8,
+    marginBottom: 20,
+    borderRadius: 12,
     overflow: 'hidden',
   },
-  sharedFilesList: {
-    marginTop: 10,
-    maxHeight: '70%',
-    paddingHorizontal: 10,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  cell: {
+  emptyContainer: {
     flex: 1,
-    textAlign: 'center',
-    fontSize: 12,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: 200,
   },
-  rowHeader: {
-    fontWeight: 'bold',
-  },
-  fileName: {
-    flex: 2,
-    textAlign: 'left',
-  },
-  
 });
+
 export default Files;
