@@ -1,6 +1,6 @@
 import {router, Href} from "expo-router";
 import { StyleSheet, ViewStyle, TextStyle, Pressable, Text } from "react-native";
-import { useTheme } from "../context/themeProvider";
+import { useTheme } from "../context/themeProvider.context";
 
 type AppButtonProps = {
   title: string;

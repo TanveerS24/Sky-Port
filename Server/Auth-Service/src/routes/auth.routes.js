@@ -8,6 +8,7 @@ import updatePassword from '../controllers/updatePassword.controller.js';
 import deleteUser from '../controllers/deleteUser.controller.js';
 import sendEmailController from '../controllers/sendEmail.controller.js';
 import verifyOTPController from '../controllers/verifyOTP.controller.js';
+import isVerifiedController from '../controllers/isVerified.controlled.js';
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.patch('/update-password/:userId', updatePassword);
 router.delete('/delete-user/:id', deleteUser);
 router.post('/send-otp', sendEmailController);
 router.post('/verify-otp', verifyOTPController);
+router.post('/is-verified', isVerifiedController);
 
 export default router;

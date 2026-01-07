@@ -7,11 +7,12 @@ const findByEmail = async (req, res) => {
         const email = req.params.email;
         const emailHash = hashForSearch(email);
 
-        const user = await User.findOne({ emailHash });
+        const user = await User.findOne({ emailHash }).populate('type');
+        console.log("User found:", user ? "Yes" : "No");
         if (!user) {
+            console.log("User not found for email:", email);
             return res.status(404).json({ message: "User not found" });
         }
-
         return res.json({
             user: {
                 ...user._doc,

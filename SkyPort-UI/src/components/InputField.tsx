@@ -1,5 +1,5 @@
 import { StyleSheet, TextInput, TextInputProps, View } from "react-native";
-import { useTheme } from "../context/themeProvider";
+import { useTheme } from "../context/themeProvider.context";
 
 type InputFieldProps = {
   value: string;

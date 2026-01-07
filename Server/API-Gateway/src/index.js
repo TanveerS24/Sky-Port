@@ -23,5 +23,5 @@ app.use(morgan('dev'));
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
     console.log(`API Gateway is running on port ${PORT}`);
-    healthCheckLoop();
+    //healthCheckLoop();
 });

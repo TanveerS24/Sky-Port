@@ -36,9 +36,9 @@ export const logout = async () => {
     }
 }
 
-export const getUserByEmail = async (email: string) => {
-    const response = await http.get(`/user/findbyemail/${email}`);
-    return response.data.user;
+export const isVerified = async (email: string) => {
+    const response = await http.post('/auth/is-verified', { email });
+    return response.data.isVerified;
 }
 
 export const refreshAccessToken = async () => {
@@ -58,7 +58,12 @@ export const refreshAccessToken = async () => {
     return accessToken;
 }
 
-export const editUser = async (userId: string, updates: { username: string }) => {
-    const response = await http.patch(`/user/edituser/${userId}`, updates);
-    return response.data.user;
+export const sendVerificationOTP = async (email: string) => {
+    const response = await http.post('/auth/send-otp', { email });
+    return response.data;
+}
+
+export const verifyEmail = async (email: string, otp: string) => {
+    const response = await http.post('/auth/verify-otp', { email, otp });
+    return response.data;
 }

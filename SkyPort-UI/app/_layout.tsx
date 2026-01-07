@@ -1,12 +1,14 @@
 import { Stack } from "expo-router";
-import { AuthProvider, useAuth } from "../src/context/authProvider";
-import { ThemeProvider } from "../src/context/themeProvider";
+import { AuthProvider, useAuth } from "../src/context/authProvider.context";
+import { UserProvider, useUser } from "../src/context/user.context";
+import { ThemeProvider } from "../src/context/themeProvider.context";
 import { View, ActivityIndicator, StyleSheet } from "react-native";
 
 function RootLayout() {
   const { isAuthenticated, isLoading } = useAuth();
+  const { isLoading: userLoading, usertype } = useUser();
 
-  if (isLoading) {
+  if (isLoading || userLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#007AFF" />
@@ -18,6 +20,8 @@ function RootLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       {!isAuthenticated ? (
         <Stack.Screen name="(auth)" />
+      ) : usertype === "admin" ? (
+        <Stack.Screen name="(admin)" />
       ) : (
         <Stack.Screen name="(app)" />
       )}
@@ -29,7 +33,9 @@ export default function Layout() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <RootLayout />
+        <UserProvider>
+          <RootLayout />
+        </UserProvider>
       </AuthProvider>
     </ThemeProvider>
   );

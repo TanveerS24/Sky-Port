@@ -1,25 +1,27 @@
-import {View, Text, StyleSheet, Pressable, ActivityIndicator, Alert} from 'react-native';
+import {View, Text, StyleSheet, Platform, Pressable, ActivityIndicator, Alert} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
-import { useAuth } from '../../context/authProvider';
-import { useTheme } from '../../context/themeProvider';
+import { useTheme } from '../../../context/themeProvider.context';
+import { useAuth } from '../../../context/authProvider.context';
 
-import AppButton from "../../components/AppButton"
-import InputField from '../../components/InputField';
-import SubmitButton from '../../components/SubmitButton';
+import AppButton from "../../../components/AppButton"
+import InputField from '../../../components/InputField';
+import SubmitButton from '../../../components/SubmitButton';
 
 
-const Login = () => {
-    const { login, isLoading } = useAuth();
+const Register = () => {
     const { colors, theme, toggleTheme } = useTheme();
+    const { register, isLoading } = useAuth();
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = async () => {
+    const handleRegister = async () => {
         try {
-            await login(email, password);
+            await register(username, email, password);
+            Alert.alert('Success', 'Registration successful! Please login.');
         } catch (error: any) {
-            Alert.alert('Login Failed', error.message);
+            Alert.alert('Registration Failed', error.message);
         }
     };
 
@@ -27,8 +29,16 @@ const Login = () => {
         <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
             <SafeAreaView style={styles.container}>
                 <Text style={[styles.text, { color: colors.headingPrimary }]}>
-                    Welcome Back
+                    Create Account
                 </Text>
+                <Text style={[styles.details, { color: colors.textSecondary }]}>
+                    Enter Username
+                </Text>
+                <InputField 
+                    value={username}
+                    onChangeText={setUsername}
+                    placeholder="Username"
+                />
                 <Text style={[styles.details, { color: colors.textSecondary }]}>
                     Enter Email
                 </Text>
@@ -36,8 +46,7 @@ const Login = () => {
                     value={email}
                     onChangeText={setEmail}
                     placeholder="Email"
-                    style={styles.inputField}
-                    keyboardType="default"
+                    keyboardType="email-address"
                 />
                 <Text style={[styles.details, { color: colors.textSecondary }]}>
                     Enter Password
@@ -46,17 +55,22 @@ const Login = () => {
                     value={password}
                     onChangeText={setPassword}
                     placeholder="Password"
-                    style={[styles.inputField, { color: colors.textSecondary }]}
                     secureTextEntry
                 />
                 {isLoading && (
                     <View style={styles.loadingContainer}>
                         <ActivityIndicator size="large" color={colors.btnPrimaryBg} />
-                        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Logging in...</Text>
+                        <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Creating account...</Text>
                     </View>
                 )}
-                {!isLoading && <SubmitButton onPress={handleLogin} title="Login" disabled={email === '' || password === '' || isLoading} />}
-                <AppButton title="New Here? Register now" to="/(auth)/register" replace />
+                {!isLoading && (
+                    <SubmitButton 
+                        onPress={handleRegister} 
+                        title="Register" 
+                        disabled={username === '' || email === '' || password === '' || isLoading} 
+                    />
+                )}
+                <AppButton title="Already have an account? Login" to="/(auth)/login" replace />
             </SafeAreaView>
         </View>
     );
@@ -88,9 +102,6 @@ const styles = StyleSheet.create({
         zIndex: 10,
         padding: 10,
     },
-    inputField: {
-        borderRadius: 8,
-    },
     loadingContainer: {
         marginTop: 20,
         alignItems: 'center',
@@ -101,4 +112,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Login;
+export default Register;
