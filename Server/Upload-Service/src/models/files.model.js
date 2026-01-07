@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import crypto from "crypto";
 
 const userFilesSchema = new mongoose.Schema({
     ownerId: {
@@ -36,8 +37,14 @@ const userFilesSchema = new mongoose.Schema({
             }
         },
         sharedWith: [{
-            type: String
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
         }],
+        expiry: {
+            type: Map,
+            of: Date,
+            default: {}
+        },
         createdAt: {
             type: Date,
             default: Date.now

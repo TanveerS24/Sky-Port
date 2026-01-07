@@ -1,4 +1,4 @@
-import {comparePassword, hashPassword} from '../utils/hash.util.js';
+import { comparePassword, hashPassword } from '../utils/hash.util.js';
 import axios from 'axios';
 import authUser from '../models/authUser.model.js';
 
@@ -14,12 +14,12 @@ const updatePassword = async (req, res) => {
             return res.status(401).json({ message: 'Couldnt find access token' });
         }
 
-        const user = await axios.get(`${process.env.API_GATEWAY_URL}/api/user/findbyuser/${userId}`,{
+        const user = await axios.get(`${process.env.API_GATEWAY_URL}/api/user/findbyuser/${userId}`, {
             headers: {
                 'Authorization': token
             }
         });
-        if(user.status !== 200){
+        if (user.status !== 200) {
             console.error('User not found in User Service for userId:', userId);
             return res.status(404).json({ message: 'User not found' });
         }
