@@ -16,7 +16,11 @@ const uploadFile = async (req, res) => {
         // Upload to Cloudinary first
         cloudinaryResult = await new Promise((resolve, reject) => {
             cloudinary.uploader.upload_stream(
-                { folder },
+                { 
+                    folder,
+                    resource_type: 'auto', // Automatically detect image, video, or raw file
+                    chunk_size: 6000000 // 6MB chunks for large files
+                },
                 (err, result) => (err ? reject(err) : resolve(result))
             ).end(req.file.buffer);
         });
