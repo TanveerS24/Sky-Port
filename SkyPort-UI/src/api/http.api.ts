@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getFromSecureStore, saveToSecureStore } from '../utils/secureStore.util';
 
 const http = axios.create({
-    baseURL: 'http://192.168.0.108:3005/api', // Adjust the baseURL as needed
+    baseURL: 'http://192.168.0.106:3005/api', // Adjust the baseURL as needed
     withCredentials: true, // Include cookies for cross-origin requests
 });
 
@@ -57,7 +57,7 @@ http.interceptors.response.use(
                 }
 
                 // Call refresh token endpoint
-                const response = await axios.post('http://192.168.0.108:3005/api/auth/refresh-token', { 
+                const response = await http.post('/auth/refresh-token', { 
                     refreshToken 
                 });
                 
