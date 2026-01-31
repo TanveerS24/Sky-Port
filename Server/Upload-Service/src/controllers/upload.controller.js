@@ -1,12 +1,13 @@
 import cloudinary from "../config/cloudinary.config.js";
 import UserFiles from "../models/files.model.js";
+import crypto from "crypto";
 
 const uploadFile = async (req, res) => {
     console.log("Upload File endpoint Invoked");
     let cloudinaryResult = null;
     
     try {
-        const { folder, ownerId } = req.body;
+        const { folder, ownerId, size } = req.body;
         
         if (!req.file || !folder || !ownerId) {
             console.log("File, folder, or ownerId missing");
@@ -38,6 +39,7 @@ const uploadFile = async (req, res) => {
                 url: cloudinaryResult.secure_url
             },
             sharedWith: [],
+            size: size ? parseInt(size) : cloudinaryResult.bytes || 0,
             createdAt: new Date()
         };
 

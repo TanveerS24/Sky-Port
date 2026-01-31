@@ -2,24 +2,29 @@ import cloudinary from "../config/cloudinary.config.js";
 import UserFiles from "../models/files.model.js";
 import crypto from "crypto";
 
-const uploadMultipleFiles = async (req, res) => {
-    console.log("Upload Multiple Files endpoint Invoked");
+const uploadBulk = async (req, res) => {
+    console.log("Upload Bulk Files endpoint Invoked");
     const uploadedFiles = [];
     const failedFiles = [];
     
     try {
-        const { folder, ownerId, sizes } = req.body;
-        const sizeArray = sizes ? JSON.parse(sizes) : [];
+        const { folderPaths, ownerId } = req.body;
         
         if (!req.files || req.files.length === 0) {
             console.log("No files provided");
             return res.status(400).json({ message: "At least one file is required" });
         }
 
-        if (!folder || !ownerId) {
-            console.log("Folder or ownerId missing");
-            return res.status(400).json({ message: "Folder and ownerId are required" });
+        if (!ownerId) {
+            console.log("ownerId missing");
+            return res.status(400).json({ message: "ownerId is required" });
         }
+
+        // Parse folder paths (sent as JSON string)
+        const parsedFolderPaths = folderPaths ? JSON.parse(folderPaths) : [];
+        
+        // Parse sizes if provided
+        const sizes = req.body.sizes ? JSON.parse(req.body.sizes) : [];
 
         // Upload files one by one
         for (let i = 0; i < req.files.length; i++) {
@@ -27,10 +32,17 @@ const uploadMultipleFiles = async (req, res) => {
             let cloudinaryResult = null;
             
             try {
+                // Use the folder path from the array or default to 'skyport'
+                const folder = parsedFolderPaths[i] || 'skyport';
+                
                 // Upload to Cloudinary
                 cloudinaryResult = await new Promise((resolve, reject) => {
                     cloudinary.uploader.upload_stream(
-                        { folder },
+                        { 
+                            folder,
+                            resource_type: 'auto',
+                            chunk_size: 6000000
+                        },
                         (err, result) => (err ? reject(err) : resolve(result))
                     ).end(file.buffer);
                 });
@@ -48,7 +60,7 @@ const uploadMultipleFiles = async (req, res) => {
                         url: cloudinaryResult.secure_url
                     },
                     sharedWith: [],
-                    size: sizeArray[i] ? parseInt(sizeArray[i]) : cloudinaryResult.bytes || 0,
+                    size: sizes[i] ? parseInt(sizes[i]) : cloudinaryResult.bytes || 0,
                     createdAt: new Date()
                 };
 
@@ -63,7 +75,8 @@ const uploadMultipleFiles = async (req, res) => {
                     fileId: fileData.fileId,
                     fileName: file.originalname,
                     url: cloudinaryResult.secure_url,
-                    publicId: cloudinaryResult.public_id
+                    publicId: cloudinaryResult.public_id,
+                    folder: folder
                 });
 
                 console.log(`Database save successful for: ${file.originalname}`);
@@ -92,12 +105,11 @@ const uploadMultipleFiles = async (req, res) => {
         res.status(uploadedFiles.length > 0 ? 201 : 500).json({
             message: `Uploaded ${uploadedFiles.length} of ${req.files.length} files`,
             uploaded: uploadedFiles,
-            failed: failedFiles,
-            folder
+            failed: failedFiles
         });
         
     } catch (err) {
-        console.error("Multiple upload failed:", err);
+        console.error("Bulk upload failed:", err);
         res.status(500).json({ 
             message: "Upload failed", 
             error: err.message,
@@ -107,4 +119,4 @@ const uploadMultipleFiles = async (req, res) => {
     }
 };
 
-export default uploadMultipleFiles;
+export default uploadBulk;

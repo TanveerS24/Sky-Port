@@ -6,9 +6,10 @@ interface FileRowProps {
   item: any;
   colors: any;
   onPress: (item: any) => void;
+  onDelete?: (item: any) => void;
 }
 
-export const FileRow = ({ item, colors, onPress }: FileRowProps) => {
+export const FileRow = ({ item, colors, onPress, onDelete }: FileRowProps) => {
   if (item.type === 'folder') {
     return (
       <Pressable 
@@ -66,11 +67,31 @@ export const FileRow = ({ item, colors, onPress }: FileRowProps) => {
         </View>
       </View>
 
-      <Ionicons 
-        name="eye"
-        size={20} 
-        color={colors.btnPrimaryBg}
-      />
+      <View style={styles.actions}>
+        <Pressable onPress={() => onPress(item)} style={styles.actionButton}>
+          <Ionicons 
+            name="eye"
+            size={20} 
+            color={colors.btnPrimaryBg}
+          />
+        </Pressable>
+        
+        {onDelete && (
+          <Pressable 
+            onPress={(e) => {
+              e.stopPropagation();
+              onDelete(item);
+            }} 
+            style={styles.actionButton}
+          >
+            <Ionicons 
+              name="trash-outline"
+              size={20} 
+              color={colors.error}
+            />
+          </Pressable>
+        )}
+      </View>
     </Pressable>
   );
 };
@@ -111,5 +132,13 @@ const styles = StyleSheet.create({
   },
   uploadedAt: {
     fontSize: 12,
+  },
+  actions: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+  },
+  actionButton: {
+    padding: 4,
   },
 });

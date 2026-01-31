@@ -38,6 +38,10 @@ const userFilesSchema = new mongoose.Schema({
         sharedWith: [{
             type: String
         }],
+        size: {
+            type: Number,
+            required: true
+        },
         createdAt: {
             type: Date,
             default: Date.now

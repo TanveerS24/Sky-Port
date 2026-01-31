@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import * as DocumentPicker from 'expo-document-picker';
 import getItemsInFolder from '../../../helpers/itemsInFolder.helper';
-import { getFiles, uploadFile, uploadMultipleFiles } from '../../../api/files.api';
+import { getFiles, uploadFile, uploadMultipleFiles, deleteFile, uploadBulkFiles } from '../../../api/files.api';
 import { FileHeader } from '../../../components/FileHeader';
 import { FileRow } from '../../../components/FileRow';
 import { FilePreviewModal } from '../../../components/FilePreviewModal';
@@ -25,6 +25,7 @@ interface CloudFile {
 
 interface TransformedFile {
   oid: string;
+  fileId: string;
   name: string;
   uploadedBy: string;
   fileLocation: { folder: string };
@@ -63,7 +64,7 @@ const Files = () => {
         setError(null);
         const cloudFiles = await getFiles({});
         
-        console.log('Cloud files response:', cloudFiles);
+        console.log("Fetched successfully")
         
         if (!cloudFiles || !Array.isArray(cloudFiles)) {
           console.warn('Invalid response format, expected array:', cloudFiles);
@@ -83,6 +84,7 @@ const Files = () => {
 
           return {
             oid: file._id,
+            fileId: file.fileId,
             name: file.fileName,
             uploadedBy: 'You',
             fileLocation: { 
@@ -96,7 +98,7 @@ const Files = () => {
           };
         });
         
-        console.log('Transformed files:', transformed);
+        //console.log('Transformed files:', transformed);
         setFilesData(transformed);
       } catch (err: any) {
         console.error('Error fetching files:', err);
@@ -159,6 +161,12 @@ const Files = () => {
 
       const files = result.assets;
       
+      // Limit to 50 files at once
+      if (files.length > 50) {
+        Alert.alert('Too Many Files', 'Please select up to 50 files at a time.');
+        return;
+      }
+      
       setUploading(true);
       setUploadProgress({ current: 0, total: files.length, fileName: '', completed: false });
       
@@ -168,37 +176,39 @@ const Files = () => {
         folderPath = `skyport/${currentFolder}`;
       }
       
-      // Upload files one by one with progress
-      const results = await uploadMultipleFiles(
-        files.map(f => ({
-          uri: f.uri,
-          name: f.name,
-          type: f.mimeType || 'application/octet-stream',
-        })),
-        folderPath,
-        (fileName, current, total) => {
-          setUploadProgress({ current, total, fileName, completed: false });
+      try {
+        // Use bulk upload for better performance
+        const result = await uploadBulkFiles(
+          files.map(f => ({
+            uri: f.uri,
+            name: f.name,
+            type: f.mimeType || 'application/octet-stream',
+            size: f.size,
+            folder: folderPath,
+          }))
+        );
+        
+        setUploadProgress(prev => prev ? { ...prev, completed: true } : null);
+        
+        const successCount = result.uploaded?.length || 0;
+        const failCount = result.failed?.length || 0;
+        
+        if (failCount > 0) {
+          Alert.alert('Upload Completed', `${successCount} file(s) uploaded successfully, ${failCount} failed`);
+        } else {
+          Alert.alert('Success', `${successCount} file(s) uploaded successfully`);
         }
-      );
-      
-      // Mark as completed
-      setUploadProgress(prev => prev ? { ...prev, completed: true } : null);
-      
-      const successCount = results.filter(r => r.success).length;
-      const failCount = results.filter(r => !r.success).length;
-      
-      if (failCount > 0) {
-        Alert.alert('Upload Completed', `${successCount} file(s) uploaded successfully, ${failCount} failed`);
-      } else {
-        Alert.alert('Success', `${successCount} file(s) uploaded successfully`);
+        
+        // Refresh the file list
+        await fetchFiles();
+      } catch (uploadError: any) {
+        console.error('Bulk upload error:', uploadError);
+        Alert.alert('Upload Error', uploadError.response?.data?.message || 'Failed to upload files');
       }
       
-      // Refresh the file list
-      await fetchFiles();
-      
     } catch (error: any) {
-      console.error('Error uploading file:', error);
-      Alert.alert('Upload Error', error.response?.data?.message || 'Failed to upload file');
+      console.error('Error selecting files:', error);
+      Alert.alert('Error', 'Failed to select files');
       setUploadProgress(null);
     } finally {
       setUploading(false);
@@ -212,6 +222,36 @@ const Files = () => {
 
   const handleDismissProgress = () => {
     setUploadProgress(null);
+  };
+
+  const handleDeleteFile = async (item: TransformedFile) => {
+    Alert.alert(
+      'Delete File',
+      `Are you sure you want to delete "${item.name}"?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await deleteFile(item.fileId);
+              Alert.alert('Success', 'File deleted successfully');
+              await fetchFiles();
+            } catch (error: any) {
+              console.error('Error deleting file:', error);
+              Alert.alert('Delete Error', error.response?.data?.message || 'Failed to delete file');
+            } finally {
+              setLoading(false);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const emptyFiles = () => {
@@ -270,6 +310,7 @@ const Files = () => {
                     item={item}
                     colors={colors}
                     onPress={handleItemPress}
+                    onDelete={item.type === 'file' ? handleDeleteFile : undefined}
                   />
                 )}
               />
@@ -352,16 +393,18 @@ const Files = () => {
               >
                 <View style={[styles.menuContainer, { backgroundColor: colors.bgSecondary }]}>
                   <TouchableOpacity 
-                    style={[styles.menuItem, { borderBottomColor: colors.textSecondary }]}
+                    style={[styles.menuItem, { borderBottomColor: colors.borderMuted }]}
                     onPress={handleAddFile}
                   >
-                    <Text style={[styles.menuItemText, { color: colors.textPrimary }]}>📄 Add File</Text>
+                    <Text style={[styles.menuItemText, { color: colors.textPrimary }]}>📄 Upload Files</Text>
+                    <Text style={[styles.menuItemSubtext, { color: colors.textMuted }]}>Select multiple files (up to 50)</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
                     style={styles.menuItem}
                     onPress={handleAddFolder}
                   >
-                    <Text style={[styles.menuItemText, { color: colors.textPrimary }]}>📁 Add Multiple Files</Text>
+                    <Text style={[styles.menuItemText, { color: colors.textPrimary }]}>📁 Upload Folder Contents</Text>
+                    <Text style={[styles.menuItemSubtext, { color: colors.textMuted }]}>Bulk upload entire folders</Text>
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
@@ -442,11 +485,14 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: 'transparent',
   },
   menuItemText: {
     fontSize: 16,
     fontWeight: '500',
+    marginBottom: 4,
+  },
+  menuItemSubtext: {
+    fontSize: 12,
   },
   uploadingOverlay: {
     position: 'absolute',

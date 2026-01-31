@@ -8,10 +8,20 @@ export const getFiles = async (file: any) => {
     return Array.isArray(response.data) ? response.data : response.data.files || [];
 }
 
+export const deleteFile = async (fileId: string) => {
+    const userId = await getFromSecureStore('userId');
+    const response = await http.post('/files/delete', {
+        fileId,
+        ownerId: userId
+    });
+    return response.data;
+}
+
 export const uploadFile = async (fileData: {
     uri: string;
     name: string;
     type: string;
+    size?: number;
     folder?: string;
 }) => {
     const userId = await getFromSecureStore('userId');
@@ -30,6 +40,9 @@ export const uploadFile = async (fileData: {
     if (fileData.folder) {
         formData.append('folder', fileData.folder);
     }
+    if (fileData.size) {
+        formData.append('size', fileData.size.toString());
+    }
     
     const response = await http.post('/files/upload', formData, {
         headers: {
@@ -44,6 +57,7 @@ export const uploadMultipleFiles = async (files: Array<{
     uri: string;
     name: string;
     type: string;
+    size?: number;
 }>, folder: string, onProgress?: (fileName: string, index: number, total: number) => void) => {
     const userId = await getFromSecureStore('userId');
     const results = [];
@@ -66,6 +80,9 @@ export const uploadMultipleFiles = async (files: Array<{
         
         formData.append('ownerId', userId || '');
         formData.append('folder', folder);
+        if (file.size) {
+            formData.append('size', file.size.toString());
+        }
         
         try {
             const response = await http.post('/files/upload', formData, {
@@ -81,4 +98,46 @@ export const uploadMultipleFiles = async (files: Array<{
     }
     
     return results;
+}
+
+export const uploadBulkFiles = async (files: Array<{
+    uri: string;
+    name: string;
+    type: string;
+    size?: number;
+    folder?: string;
+}>) => {
+    const userId = await getFromSecureStore('userId');
+    
+    const formData = new FormData();
+    
+    // Append all files
+    files.forEach((file) => {
+        formData.append('files', {
+            uri: file.uri,
+            name: file.name,
+            type: file.type,
+        } as any);
+    });
+    
+    // Append other fields
+    formData.append('ownerId', userId || '');
+    
+    // Append folder paths as JSON array
+    const folderPaths = files.map(f => f.folder || 'skyport');
+    formData.append('folderPaths', JSON.stringify(folderPaths));
+    
+    // Append sizes as JSON array if available
+    if (files.some(f => f.size)) {
+        const sizes = files.map(f => f.size || 0);
+        formData.append('sizes', JSON.stringify(sizes));
+    }
+    
+    const response = await http.post('/files/upload-bulk', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+    
+    return response.data;
 }
