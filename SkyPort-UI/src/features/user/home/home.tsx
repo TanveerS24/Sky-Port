@@ -5,12 +5,35 @@ import { useRouter } from 'expo-router';
 import AppCard from '../../../components/AppCard';
 import { useAuth } from '../../../context/authProvider.context';
 import { useUser } from '../../../context/user.context';
+import { useState, useEffect } from 'react';
+import { getNotifications } from '../../../api/user.api';
+import { getFromSecureStore } from '../../../utils/secureStore.util';
 
 const Home = () => {
   const { colors } = useTheme();
   const router = useRouter();
   const { user } = useUser();
+  const [notificationCount, setNotificationCount] = useState(0);
   
+
+  useEffect(() => {
+    loadNotifications();
+    // Refresh notifications every 30 seconds
+    const interval = setInterval(loadNotifications, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadNotifications = async () => {
+    try {
+      const userEmail = await getFromSecureStore('userEmail');
+      if (userEmail) {
+        const response = await getNotifications(userEmail);
+        setNotificationCount(response.unreadCount || 0);
+      }
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    }
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
@@ -33,7 +56,7 @@ const Home = () => {
         <AppCard title="Your Files" to="/files" />
         <AppCard title="Your DashBoard" to="/dashboard" />
         <AppCard title="Shared Files" to="/sharedFiles" />
-        <AppCard title="Your Friends" to="/friends" />
+        <AppCard title="Your Friends" to="/friends" badge={notificationCount} />
         <AppCard title="Start a Chat" to="/chats" />
       </View> 
     </View>

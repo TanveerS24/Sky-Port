@@ -9,6 +9,7 @@ type AppCardProps = {
     replace?: boolean;
     style?: ViewStyle;
     textStyle?: TextStyle;
+    badge?: number; // Notification badge count
 };
 
 export default function AppCard({
@@ -17,7 +18,8 @@ export default function AppCard({
     to,
     replace,
     style,
-    textStyle
+    textStyle,
+    badge
 }: AppCardProps) {
     const { colors } = useTheme();
     const handlePress = () => {
@@ -30,7 +32,7 @@ export default function AppCard({
     };
 
     return (
-        <View>
+        <View style={styles.container}>
             <Pressable
                 onPress={handlePress}
                 style={({pressed}) => [
@@ -40,11 +42,19 @@ export default function AppCard({
                 ]}>
                 <Text style={[styles.text, { color: colors.textSecondary }, textStyle]}>{title}</Text>
             </Pressable>
+            {badge !== undefined && badge > 0 && (
+                <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{badge > 99 ? '99+' : badge}</Text>
+                </View>
+            )}
         </View>
     )
 };
 
 const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+  },
   card: {
     padding: 20,
     borderRadius: 10,
@@ -54,8 +64,25 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.85,
   },
-    text: {
+  text: {
     fontSize: 18,
     fontWeight: '500',
+  },
+  badge: {
+    position: 'absolute',
+    top: 5,
+    right: 15,
+    backgroundColor: '#f44336',
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
