@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { getFromSecureStore, saveToSecureStore } from '../utils/secureStore.util';
+import env from '../config/env';
 
 const http = axios.create({
-    baseURL: 'http://192.168.0.106:3005/api', // Adjust the baseURL as needed
+    baseURL: env.API_BASE_URL,
     withCredentials: true, // Include cookies for cross-origin requests
 });
 
