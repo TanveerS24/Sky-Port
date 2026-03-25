@@ -4,7 +4,7 @@ export const saveToSecureStore = async (key: string, value: string): Promise<voi
     try {
         await SecureStore.setItemAsync(key, value);
     } catch (error) {
-        console.error('Error saving to secure store:', error);
+        console.error('Unable to save to secure store:', error);
     }
 };
 
@@ -13,7 +13,7 @@ export const getFromSecureStore = async (key: string): Promise<string | null> =>
         const value = await SecureStore.getItemAsync(key);
         return value;
     } catch (error) {
-        console.error('Error retrieving from secure store:', error);
+        console.error('Unable to retrieve from secure store:', error);
         return null;
     }
 };
@@ -22,6 +22,6 @@ export const deleteFromSecureStore = async (key: string): Promise<void> => {
     try {
         await SecureStore.deleteItemAsync(key);
     } catch (error) {
-        console.error('Error deleting from secure store:', error);
+        console.error('Unable to delete from secure store:', error);
     }
 };
